@@ -72,16 +72,11 @@ body {
   font-size: 1.2rem;
 }
 
-.logo-mark {
+.logo-img {
   width: 36px;
   height: 36px;
-  background: var(--primary);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border-radius: 8px;
-  font-weight: 800;
+  display: block;
 }
 
 .logo-text {
