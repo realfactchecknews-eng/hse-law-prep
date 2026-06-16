@@ -100,7 +100,12 @@ function initMobileMenu() {
     nav.classList.toggle('open');
   });
   nav.addEventListener('click', (e) => {
-    if (e.target.tagName === 'A') nav.classList.remove('open');
+    if (e.target.tagName === 'A') {
+      e.preventDefault();
+      nav.classList.remove('open');
+      const route = e.target.dataset.route;
+      if (route) navigate(route);
+    }
   });
 }
 
@@ -172,8 +177,9 @@ function renderOlympiads(container) {
         <span class="badge badge-accent">${o.level}</span>
         <span class="badge badge-success">${o.grades}</span>
       </div>
-      <p style="margin-top:14px;"><strong>Льготы:</strong> ${o.benefits}</p>
+      <p style="margin-top:14px;"><strong>Статус на 16 июня 2026:</strong> ${o.status}</p>
       <p style="margin-top:8px;"><strong>Этапы:</strong> ${o.stages}</p>
+      <p style="margin-top:8px;"><strong>Льготы:</strong> ${o.benefits}</p>
       <div class="topic-actions" style="margin-top:18px;">
         ${o.links.map(l => `<a class="btn btn-outline" href="${l.url}" target="_blank" rel="noopener">${l.title}</a>`).join('')}
       </div>
@@ -182,33 +188,47 @@ function renderOlympiads(container) {
 
   container.innerHTML = `
     <h1 class="page-title">Олимпиады для поступления на юриспруденцию</h1>
-    <p class="page-subtitle">Перечневые олимпиады по праву, обществознанию, истории и экономике, которые дают льготы при поступлении.</p>
+    <p class="page-subtitle">Перечневые олимпиады по праву, обществознанию, истории и экономике. Данные актуальны на 16 июня 2026: указаны итоги сезона 2025/26 и ориентировочные сроки регистрации на 2026/27.</p>
     <div class="card-grid">${cards}</div>
   `;
 }
 
 /* ===== Render: Universities ===== */
 function renderUniversities(container) {
-  const cards = APP_DATA.universities.map(u => `
-    <div class="card">
-      <h3>${u.name}</h3>
-      <p>${u.note}</p>
-      <div class="meta">
-        <span class="badge">${u.city}</span>
-        <span class="badge badge-accent">${u.program}</span>
+  const tiers = {};
+  APP_DATA.universities.forEach(u => {
+    if (!tiers[u.tier]) tiers[u.tier] = [];
+    tiers[u.tier].push(u);
+  });
+
+  const tierOrder = ['Топовые вузы', 'Сильные юридические вузы', 'Хорошие региональные вузы', 'Другие вузы'];
+  const sections = tierOrder.filter(t => tiers[t]).map(tier => {
+    const cards = tiers[tier].map(u => `
+      <div class="card">
+        <h3>${u.name}</h3>
+        <p>${u.note}</p>
+        <div class="meta">
+          <span class="badge">${u.city}</span>
+          <span class="badge badge-accent">${u.program}</span>
+        </div>
+        <p style="margin-top:14px;"><strong>Примерный проходной балл на бюджет (3 предмета):</strong> ${u.budgetEge}</p>
+        <p style="margin-top:8px;"><strong>Вступительные испытания:</strong> ${u.exams}</p>
+        <p style="margin-top:8px;"><strong>Релевантные олимпиады:</strong> ${u.olympiads}</p>
+        <div class="topic-actions" style="margin-top:18px;">
+          <a class="btn btn-outline" href="${u.site}" target="_blank" rel="noopener">Сайт вуза</a>
+        </div>
       </div>
-      <p style="margin-top:14px;"><strong>Вступительные испытания:</strong> ${u.exams}</p>
-      <p style="margin-top:8px;"><strong>Релевантные олимпиады:</strong> ${u.olympiads}</p>
-      <div class="topic-actions" style="margin-top:18px;">
-        <a class="btn btn-outline" href="${u.site}" target="_blank" rel="noopener">Сайт вуза</a>
-      </div>
-    </div>
-  `).join('');
+    `).join('');
+    return `
+      <h2 class="section-title">${tier}</h2>
+      <div class="card-grid">${cards}</div>
+    `;
+  }).join('');
 
   container.innerHTML = `
     <h1 class="page-title">ВУЗы для поступления на юриспруденцию</h1>
-    <p class="page-subtitle">Куда можно поступить с олимпиадными льготами по праву, обществознанию и истории.</p>
-    <div class="card-grid">${cards}</div>
+    <p class="page-subtitle">Куда можно поступить с олимпиадными льготами. Проходные баллы — примерные, ориентировочные для бюджета по прошлым годам; точные цифры публикуются вузами в текущем году.</p>
+    ${sections}
   `;
 }
 
