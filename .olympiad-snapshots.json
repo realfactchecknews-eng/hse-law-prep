@@ -1,0 +1,86 @@
+{
+  "hse-high-proba": {
+    "url": "https://olymp.hse.ru/mmo/",
+    "hash": "03d3f21e04088775b7a770549cb7d43e",
+    "checked_at": "2026-06-16T16:57:11.673540",
+    "status": 200
+  },
+  "vso-pravo": {
+    "url": "https://rsr-olymp.ru/",
+    "hash": "989e59dca71b774d9effb106da89a907",
+    "checked_at": "2026-06-16T16:57:15.677056",
+    "status": 200
+  },
+  "lomonosov": {
+    "url": "https://olymp.msu.ru",
+    "hash": "809212929dcf48ae225581c0c67dfb88",
+    "checked_at": "2026-06-16T16:57:16.108691",
+    "status": 200
+  },
+  "spbu": {
+    "url": "https://www.olympiada.spbu.ru/",
+    "hash": "01a7268e0624643db49fe941a65cc372",
+    "checked_at": "2026-06-16T16:57:16.820143",
+    "status": 200
+  },
+  "kutafin": {
+    "url": "https://msal.ru/content/abiturientam/olimpiady-i-konkursy/kutafinskaya-olimpiada-shkolnikov-po-pravu/",
+    "hash": "94f6e1ed5dd2b2988bbcfbfc37e0003d",
+    "checked_at": "2026-06-16T16:57:18.084947",
+    "status": 200
+  },
+  "femida": {
+    "url": "https://olymp.rgup.ru/",
+    "hash": "79103854c82a224174624fbc1671a29c",
+    "checked_at": "2026-06-16T16:57:18.548526",
+    "status": 200
+  },
+  "v-mir-prava": {
+    "url": "https://olimp.rpa-mu.ru/",
+    "hash": "3437f71461f949d11abd4805235abcb0",
+    "checked_at": "2026-06-16T16:57:19.859126",
+    "status": 200
+  },
+  "tolstovsky": {
+    "url": "https://olymp.tsput.ru/",
+    "hash": "0e62e8248c5bb35f937c53e62bc6a940",
+    "checked_at": "2026-06-16T16:57:20.374449",
+    "status": 200
+  },
+  "mission": {
+    "url": "https://www.fa.ru/for-applicants/olympiads/mission/",
+    "hash": "adabc0aee9375059ea6187e284bbaeac",
+    "checked_at": "2026-06-16T16:57:21.159985",
+    "status": 200
+  },
+  "ranepa": {
+    "url": "https://www.ranepa.ru/olymp/",
+    "hash": "78481f28f091a6b5627ff73044fe98c5",
+    "checked_at": "2026-06-16T16:57:41.517267",
+    "status": 200
+  },
+  "mgimo": {
+    "url": "https://olymp.mgimo.ru",
+    "hash": "78481f28f091a6b5627ff73044fe98c5",
+    "checked_at": "2026-06-16T16:57:41.791214",
+    "status": 200
+  },
+  "uriyu": {
+    "url": "https://usla.ru/",
+    "hash": "de803aeac8ab0dfccc35876580c487cd",
+    "checked_at": "2026-06-16T16:57:43.249496",
+    "status": 200
+  },
+  "mosh": {
+    "url": "https://мош.цпм.рф",
+    "hash": "f3250649cf18f05f3cb2ec2ed3747e0d",
+    "checked_at": "2026-06-16T16:57:43.855435",
+    "status": 200
+  },
+  "pokori-vorobevy": {
+    "url": "https://pvg.mk.ru",
+    "hash": "9090c27a3e9593fa271ca6c726560f4e",
+    "checked_at": "2026-06-16T16:57:44.406905",
+    "status": 200
+  }
+}

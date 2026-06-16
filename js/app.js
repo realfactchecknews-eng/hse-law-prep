@@ -177,7 +177,7 @@ function renderOlympiads(container) {
         <span class="badge badge-accent">${o.level}</span>
         <span class="badge badge-success">${o.grades}</span>
       </div>
-      <p style="margin-top:14px;"><strong>Статус на 16 июня 2026:</strong> ${o.status}</p>
+      <p style="margin-top:14px;"><strong>Статус:</strong> ${o.status}</p>
       <p style="margin-top:8px;"><strong>Этапы:</strong> ${o.stages}</p>
       <p style="margin-top:8px;"><strong>Льготы:</strong> ${o.benefits}</p>
       <div class="topic-actions" style="margin-top:18px;">
@@ -188,7 +188,7 @@ function renderOlympiads(container) {
 
   container.innerHTML = `
     <h1 class="page-title">Олимпиады для поступления на юриспруденцию</h1>
-    <p class="page-subtitle">Перечневые олимпиады по праву, обществознанию, истории и экономике. Данные актуальны на 16 июня 2026: указаны итоги сезона 2025/26 и ориентировочные сроки регистрации на 2026/27.</p>
+    <p class="page-subtitle">Перечневые олимпиады по праву, обществознанию, истории и экономике. Указаны ориентировочные сроки регистрации и проведения; точные даты публикуются на официальных сайтах ближе к началу сезона.</p>
     <div class="card-grid">${cards}</div>
   `;
 }
