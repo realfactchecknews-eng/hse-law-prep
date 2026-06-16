@@ -7,6 +7,7 @@ const state = {
 const routes = {
   home: renderHome,
   olympiads: renderOlympiads,
+  universities: renderUniversities,
   topics: renderTopics,
   topic: renderTopicDetail,
   tests: renderTests,
@@ -135,6 +136,10 @@ function renderHome(container) {
         <h3>Олимпиады</h3>
         <p>Всё о Высшей пробе, ВСОШ и других олимпиадах, которые принимает ВШЭ на юриспруденцию.</p>
       </div>
+      <div class="card" data-goto="universities">
+        <h3>ВУЗы</h3>
+        <p>Куда поступать на юриспруденцию: ВШЭ, МГУ, СПбГУ, МГЮА, РГУП, УрГЮУ и другие вузы.</p>
+      </div>
     </div>
 
     <h2 class="section-title">Что важно знать</h2>
@@ -177,7 +182,32 @@ function renderOlympiads(container) {
 
   container.innerHTML = `
     <h1 class="page-title">Олимпиады для поступления на юриспруденцию</h1>
-    <p class="page-subtitle">ВШЭ принимает победителей и призёров этих олимпиад по льготным условиям.</p>
+    <p class="page-subtitle">Перечневые олимпиады по праву, обществознанию, истории и экономике, которые дают льготы при поступлении.</p>
+    <div class="card-grid">${cards}</div>
+  `;
+}
+
+/* ===== Render: Universities ===== */
+function renderUniversities(container) {
+  const cards = APP_DATA.universities.map(u => `
+    <div class="card">
+      <h3>${u.name}</h3>
+      <p>${u.note}</p>
+      <div class="meta">
+        <span class="badge">${u.city}</span>
+        <span class="badge badge-accent">${u.program}</span>
+      </div>
+      <p style="margin-top:14px;"><strong>Вступительные испытания:</strong> ${u.exams}</p>
+      <p style="margin-top:8px;"><strong>Релевантные олимпиады:</strong> ${u.olympiads}</p>
+      <div class="topic-actions" style="margin-top:18px;">
+        <a class="btn btn-outline" href="${u.site}" target="_blank" rel="noopener">Сайт вуза</a>
+      </div>
+    </div>
+  `).join('');
+
+  container.innerHTML = `
+    <h1 class="page-title">ВУЗы для поступления на юриспруденцию</h1>
+    <p class="page-subtitle">Куда можно поступить с олимпиадными льготами по праву, обществознанию и истории.</p>
     <div class="card-grid">${cards}</div>
   `;
 }
