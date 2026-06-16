@@ -561,5 +561,166 @@ function bindGoto(container) {
   });
 }
 
+/* ===== AI-юрист: плавающий чат ===== */
+const AI_CHAT_STORAGE_KEY = 'law-prep-ai-chat';
+const AI_SYSTEM_PROMPT = `Ты — серьёзный юридический консультант для школьника, готовящегося к олимпиадам по праву и поступлению на юриспруденцию.
+
+Твоя задача:
+- Помогать с теорией государства и права, конституционным правом, олимпиадными задачами, терминами и логикой правовых рассуждений.
+- Объяснять понятия просто, но точно.
+- При ответе на вопросы олимпиадного уровня не давать готовый ответ сразу, а направлять ученика к правильной логике рассуждения.
+- Отвечать чётко, структурированно, по существу.
+- Не придумывать факты, статьи законов и судебные решения. Если не уверен — скажи об этом.
+- Не давать официальных юридических консультаций, имеющих силу заключения.
+
+Формат: используй короткие абзацы, списки и выделение ключевых терминов жирным.`;
+
+function initAIChat() {
+  const toggle = document.getElementById('aiChatToggle');
+  const close = document.getElementById('aiChatClose');
+  const windowEl = document.getElementById('aiChatWindow');
+  const messagesEl = document.getElementById('aiChatMessages');
+  const input = document.getElementById('aiChatInput');
+  const sendBtn = document.getElementById('aiChatSend');
+
+  if (!toggle || !windowEl) return;
+
+  const openChat = () => windowEl.classList.add('open');
+  const closeChat = () => windowEl.classList.remove('open');
+
+  toggle.addEventListener('click', openChat);
+  close.addEventListener('click', closeChat);
+
+  // Load history
+  let history = [];
+  try {
+    const saved = localStorage.getItem(AI_CHAT_STORAGE_KEY);
+    if (saved) history = JSON.parse(saved);
+  } catch (e) {
+    history = [];
+  }
+
+  // Render saved messages
+  if (Array.isArray(history) && history.length > 0) {
+    history.forEach(msg => renderMessage(msg.role, msg.content));
+  }
+
+  const autoResize = () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  };
+
+  input.addEventListener('input', autoResize);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  sendBtn.addEventListener('click', sendMessage);
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    const userMsg = { role: 'user', content: text };
+    history.push(userMsg);
+    saveHistory(history);
+    renderMessage('user', text);
+    input.value = '';
+    input.style.height = 'auto';
+    setLoading(true);
+
+    const proxyUrl = (typeof SITE_CONFIG !== 'undefined' && SITE_CONFIG.AI_PROXY_URL) ? SITE_CONFIG.AI_PROXY_URL : null;
+    if (!proxyUrl || proxyUrl.includes('your-subdomain')) {
+      setLoading(false);
+      renderMessage('assistant', `AI-юрист не настроен. Для работы нужно развернуть прокси на Cloudflare Workers и указать его URL в <code>js/config.js</code>. Инструкция: <code>AI_CHAT_SETUP.md</code>.`);
+      return;
+    }
+
+    const messages = [
+      { role: 'system', content: AI_SYSTEM_PROMPT },
+      ...history
+    ];
+
+    try {
+      const response = await fetch(`${proxyUrl}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages })
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      const reply = data.choices?.[0]?.message?.content || 'Нет ответа от модели.';
+      const assistantMsg = { role: 'assistant', content: reply };
+      history.push(assistantMsg);
+      saveHistory(history);
+      renderMessage('assistant', reply);
+    } catch (err) {
+      renderMessage('assistant', `Ошибка при обращении к AI: ${err.message}. Проверьте настройки прокси и API-ключ.`);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function renderMessage(role, content) {
+    const div = document.createElement('div');
+    div.className = `ai-message ai-message-${role}`;
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'ai-message-content';
+    contentDiv.innerHTML = formatAIContent(content);
+    div.appendChild(contentDiv);
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function formatAIContent(text) {
+    // Escape HTML, then format markdown-like bold and lists
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+  }
+
+  function setLoading(isLoading) {
+    const existing = document.querySelector('.ai-chat-typing');
+    if (existing) existing.remove();
+
+    if (isLoading) {
+      const typing = document.createElement('div');
+      typing.className = 'ai-message ai-message-assistant ai-chat-typing';
+      typing.innerHTML = `<div class="ai-message-content"><span></span><span></span><span></span></div>`;
+      messagesEl.appendChild(typing);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      sendBtn.disabled = true;
+    } else {
+      const typing = document.querySelector('.ai-chat-typing');
+      if (typing) typing.remove();
+      sendBtn.disabled = false;
+    }
+  }
+
+  function saveHistory(history) {
+    try {
+      // Keep last 30 messages to avoid localStorage overflow
+      const trimmed = history.slice(-30);
+      localStorage.setItem(AI_CHAT_STORAGE_KEY, JSON.stringify(trimmed));
+    } catch (e) {
+      console.error('Failed to save AI chat history', e);
+    }
+  }
+}
+
 /* ===== Init ===== */
-document.addEventListener('DOMContentLoaded', initRouter);
+document.addEventListener('DOMContentLoaded', () => {
+  initRouter();
+  initAIChat();
+});

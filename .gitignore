@@ -10,3 +10,4 @@ assets/pdfs/
 assets/slides/
 generate_data.py
 data/*.txt
+data/expanded_*.json
