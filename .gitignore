@@ -4,3 +4,9 @@ Thumbs.db
 node_modules/
 .idea/
 .vscode/
+
+# Source PDFs and generated slide images are large; site data is in js/data.js
+assets/pdfs/
+assets/slides/
+generate_data.py
+data/*.txt
