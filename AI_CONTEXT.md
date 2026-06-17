@@ -4,10 +4,34 @@
 Статический сайт-платформа для подготовки к олимпиадам по праву (Высшая проба, ВСОШ, РСОШ) и поступления на юриспруденцию в ВШЭ и другие вузы. Контент берётся из PDF-презентаций онлайн-школы «Общее дело» и учебников по ТГП. Сайт развёртывается на GitHub Pages.
 
 ## Репозиторий и деплой
-- Локальный путь: `/Users/jopabobra332/hse-law-prep/`
 - GitHub: `https://github.com/realfactchecknews-eng/hse-law-prep.git`
 - GitHub Pages: `https://realfactchecknews-eng.github.io/hse-law-prep/`
-- AI-прокси (Cloudflare Worker): `https://hse-law-prep-ai.realfactchecknews.workers.dev/`
+- AI-прокси (Netlify): `https://pravo-olymp.netlify.app` (функция `netlify/functions/chat.js`)
+- Кастомный домен (в процессе): `pravolymp.ru` — куплен на reg.ru, добавлен в Netlify, DNS ещё не настроен на reg.ru
+
+## ⚠️ Что сейчас делается (незавершено)
+Подключение кастомного домена `pravolymp.ru` к Netlify чтобы AI-юрист работал без VPN в России.
+
+### Статус:
+- `pravolymp.ru` добавлен в Netlify → Site configuration → Domain management
+- Netlify показывает "Pending DNS verification" — нужно добавить DNS-записи на reg.ru
+- После добавления DNS-записей нужно обновить `js/config.js`: заменить `AI_PROXY_URL` на `https://pravolymp.ru`
+
+### Следующие шаги:
+1. В Netlify нажать **Pending DNS verification** у `pravolymp.ru` → посмотреть какие записи нужны
+2. Зайти на reg.ru → Мои домены → pravolymp.ru → DNS → добавить записи от Netlify
+3. Подождать 15-60 минут пока DNS обновится
+4. Обновить `js/config.js`: `AI_PROXY_URL: 'https://pravolymp.ru'`
+5. Закоммитить и запушить, смержить в main
+
+## Почему переехали с Cloudflare на Netlify
+`.workers.dev` домены заблокированы у многих российских провайдеров. Netlify тоже оказался заблокирован, поэтому купили кастомный домен `pravolymp.ru`.
+
+## Структура AI-прокси (актуальная)
+- `netlify/functions/chat.js` — серверная функция (заменила Cloudflare Worker)
+- `netlify.toml` — редирект `/api/chat` → `/.netlify/functions/chat`
+- `api/chat.js`, `vercel.json` — остались в репо, не используются (пробовали Vercel, отказались)
+- Переменные окружения в Netlify: `OPENROUTER_API_KEY`, `ALLOWED_ORIGINS`
 
 ## Структура проекта
 ```
