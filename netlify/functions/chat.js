@@ -45,7 +45,7 @@ exports.handler = async function(event) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${openRouterKey}`,
         'HTTP-Referer': 'https://realfactchecknews-eng.github.io/hse-law-prep/',
-        'X-Title': 'Право olymp AI',
+        'X-Title': 'Pravo Olymp AI',
       },
       body: JSON.stringify({
         model: 'openai/gpt-4o-mini',
