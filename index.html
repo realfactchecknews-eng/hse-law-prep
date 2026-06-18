@@ -66,6 +66,20 @@
         </div>
         <button class="ai-chat-close" id="aiChatClose" aria-label="Закрыть чат">&times;</button>
       </div>
+      <div class="ai-chat-consent" id="aiChatConsent">
+        <p class="ai-chat-consent-title">Прежде чем начать</p>
+        <ul class="ai-chat-consent-list">
+          <li>Ответы AI — <strong>не юридическая консультация</strong> и не имеют юридической силы</li>
+          <li>AI может ошибаться и давать устаревшую информацию</li>
+          <li>Текст сообщений передаётся на серверы OpenRouter (США) для обработки</li>
+          <li>Не вводите в чат персональные данные</li>
+        </ul>
+        <label class="ai-chat-consent-check">
+          <input type="checkbox" id="aiConsentCheck">
+          <span>Ознакомлен(а) и согласен(а)</span>
+        </label>
+        <button class="ai-chat-consent-btn" id="aiConsentAccept" disabled>Начать общение</button>
+      </div>
       <div class="ai-chat-messages" id="aiChatMessages">
         <div class="ai-message ai-message-system">
           <div class="ai-message-content">

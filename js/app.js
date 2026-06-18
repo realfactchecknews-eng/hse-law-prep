@@ -640,6 +640,7 @@ function renderTerms(container) {
 
 /* ===== AI-юрист: плавающий чат ===== */
 const AI_CHAT_STORAGE_KEY = 'law-prep-ai-chat';
+const AI_CONSENT_KEY = 'law-prep-ai-consent';
 const AI_SYSTEM_PROMPT = `Ты — серьёзный юридический консультант для школьника, готовящегося к олимпиадам по праву и поступлению на юриспруденцию.
 
 Твоя задача:
@@ -664,11 +665,30 @@ function initAIChat() {
   const messagesEl = document.getElementById('aiChatMessages');
   const input = document.getElementById('aiChatInput');
   const sendBtn = document.getElementById('aiChatSend');
+  const consentEl = document.getElementById('aiChatConsent');
+  const consentCheck = document.getElementById('aiConsentCheck');
+  const consentAccept = document.getElementById('aiConsentAccept');
 
   if (!toggle || !windowEl) return;
 
-  const openChat = () => windowEl.classList.add('open');
+  const hasConsent = () => localStorage.getItem(AI_CONSENT_KEY) === '1';
+
+  const openChat = () => {
+    windowEl.classList.add('open');
+    if (consentEl) consentEl.style.display = hasConsent() ? 'none' : 'flex';
+  };
   const closeChat = () => windowEl.classList.remove('open');
+
+  if (consentCheck && consentAccept) {
+    consentCheck.addEventListener('change', () => {
+      consentAccept.disabled = !consentCheck.checked;
+    });
+    consentAccept.addEventListener('click', () => {
+      localStorage.setItem(AI_CONSENT_KEY, '1');
+      consentEl.style.display = 'none';
+      input.focus();
+    });
+  }
 
   toggle.addEventListener('click', openChat);
   close.addEventListener('click', closeChat);
