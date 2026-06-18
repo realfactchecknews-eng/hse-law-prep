@@ -544,6 +544,18 @@ main {
   text-decoration: underline;
 }
 
+.age-rating {
+  display: inline-block;
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.4;
+  opacity: 0.7;
+  vertical-align: middle;
+}
+
 /* ===== Empty state ===== */
 .empty-state {
   text-align: center;
