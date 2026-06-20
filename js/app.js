@@ -116,12 +116,18 @@ function renderHome(container) {
   const totalTopics = APP_DATA.topics.length;
   const testCount = Object.keys(state.progress.testResults).length;
 
+  const firstUndoneTopic = APP_DATA.topics.find(t => !state.progress.completedTopics.includes(t.id));
+  const continueTarget = completedCount > 0 && firstUndoneTopic
+    ? `topic/${firstUndoneTopic.id}`
+    : 'topics';
+  const startLabel = completedCount > 0 ? 'Продолжить учить' : 'Начать учить';
+
   container.innerHTML = `
     <section class="hero">
       <h1>Готовься к олимпиадам по праву — без скуки</h1>
       <p>Интерактивная платформа для подготовки к олимпиадам по праву. Темы, тесты, прогресс и полная информация об олимпиадах, которые дают поступление в ВШЭ.</p>
       <div class="hero-actions">
-        <button class="btn btn-primary" data-goto="topics">Начать учить</button>
+        <button class="btn btn-primary" data-goto="${continueTarget}">${startLabel}</button>
         <button class="btn btn-secondary" data-goto="olympiads">Олимпиады</button>
       </div>
     </section>
@@ -150,15 +156,15 @@ function renderHome(container) {
 
     <h2 class="section-title">Что важно знать</h2>
     <div class="card-grid">
-      <div class="card">
+      <div class="card" data-goto="olympiads">
         <h3>Высшая проба</h3>
         <p>Олимпиада ВШЭ 1 уровня. Победители и призёры по праву получают <strong>БВИ</strong> (бюджетное внеконкурсное место) на юриспруденцию в ВШЭ — ЕГЭ сдавать всё равно нужно, но конкурса по баллам нет.</p>
       </div>
-      <div class="card">
+      <div class="card" data-goto="olympiads">
         <h3>ВСОШ по праву</h3>
         <p>Диплом заключительного этапа даёт БВИ на «Юриспруденцию». Этапы: школьный → муниципальный → региональный → заключительный.</p>
       </div>
-      <div class="card">
+      <div class="card" data-goto="universities">
         <h3>Поступление по олимпиадам</h3>
         <p>Значительная часть бюджетных мест в ВШЭ распределяется между победителями и призёрами олимпиад — это реальный путь, если серьёзно готовиться.</p>
       </div>

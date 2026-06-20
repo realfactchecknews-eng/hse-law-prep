@@ -171,6 +171,27 @@ main {
   border-color: var(--primary-light);
 }
 
+.card[data-goto] {
+  position: relative;
+}
+
+.card[data-goto]::after {
+  content: '→';
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  color: var(--primary);
+  font-size: 1rem;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity var(--transition), transform var(--transition);
+}
+
+.card[data-goto]:hover::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 .card h3 {
   font-size: 1.15rem;
   margin-bottom: 8px;
