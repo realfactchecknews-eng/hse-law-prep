@@ -19,6 +19,14 @@ def init_db():
                 PRIMARY KEY (user_id, olympiad_id)
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS sent_notifications (
+                user_id     INTEGER,
+                olympiad_id TEXT,
+                days_before INTEGER,
+                PRIMARY KEY (user_id, olympiad_id, days_before)
+            )
+        """)
         conn.commit()
 
 
@@ -67,3 +75,21 @@ def get_subscribers(olympiad_id: str) -> list[int]:
             "SELECT user_id FROM subscriptions WHERE olympiad_id=?", (olympiad_id,)
         ).fetchall()
     return [r["user_id"] for r in rows]
+
+
+def was_sent(user_id: int, olympiad_id: str, days_before: int) -> bool:
+    with get_conn() as conn:
+        row = conn.execute(
+            "SELECT 1 FROM sent_notifications WHERE user_id=? AND olympiad_id=? AND days_before=?",
+            (user_id, olympiad_id, days_before),
+        ).fetchone()
+    return row is not None
+
+
+def mark_sent(user_id: int, olympiad_id: str, days_before: int):
+    with get_conn() as conn:
+        conn.execute(
+            "INSERT OR IGNORE INTO sent_notifications (user_id, olympiad_id, days_before) VALUES (?, ?, ?)",
+            (user_id, olympiad_id, days_before),
+        )
+        conn.commit()
