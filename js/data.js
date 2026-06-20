@@ -52,6 +52,10 @@ const APP_DATA = {
         {
           "title": "Перечень олимпиад 2025/26",
           "url": "http://publication.pravo.gov.ru/document/0001202510020015"
+        },
+        {
+          "title": "Задания прошлых лет",
+          "url": "https://rsr-olymp.ru/"
         }
       ],
       "regStartDate": null,
@@ -110,6 +114,10 @@ const APP_DATA = {
         {
           "title": "Предметы олимпиады",
           "url": "https://www.olympiada.spbu.ru/predmety.html"
+        },
+        {
+          "title": "Задания прошлых лет",
+          "url": "https://www.olympiada.spbu.ru/predmety.html"
         }
       ],
       "regStartDate": "2026-10-25",
@@ -135,6 +143,10 @@ const APP_DATA = {
         {
           "title": "Личный кабинет olympic.msal.ru",
           "url": "https://olympic.msal.ru/"
+        },
+        {
+          "title": "Задания прошлых лет",
+          "url": "https://msal.ru/content/abiturientam/olimpiady-i-konkursy/kutafinskaya-olimpiada-shkolnikov-po-pravu/"
         }
       ],
       "regStartDate": "2026-09-01",
@@ -189,6 +201,10 @@ const APP_DATA = {
         {
           "title": "Личный кабинет",
           "url": "https://olimp-lk.rpa-mu.ru/"
+        },
+        {
+          "title": "Задания прошлых лет",
+          "url": "https://olimp.rpa-mu.ru/"
         }
       ],
       "regStartDate": "2026-10-15",
@@ -214,6 +230,10 @@ const APP_DATA = {
         {
           "title": "Профиль «Право»",
           "url": "https://olymp.tsput.ru/prof/10948/"
+        },
+        {
+          "title": "Задания прошлых лет",
+          "url": "https://olymp.tsput.ru/"
         }
       ],
       "regStartDate": "2026-12-01",
@@ -239,6 +259,10 @@ const APP_DATA = {
         {
           "title": "Регистрация / личный кабинет",
           "url": "https://my.fa.ru/auth/login"
+        },
+        {
+          "title": "Задания прошлых лет",
+          "url": "https://www.fa.ru/for-applicants/olympiads/mission/"
         }
       ],
       "regStartDate": "2026-09-15",
@@ -259,6 +283,10 @@ const APP_DATA = {
       "links": [
         {
           "title": "Сайт олимпиады",
+          "url": "https://vernadsky.online"
+        },
+        {
+          "title": "Задания прошлых лет",
           "url": "https://vernadsky.online"
         }
       ],
@@ -281,6 +309,10 @@ const APP_DATA = {
         {
           "title": "Сайт олимпиады",
           "url": "https://www.ranepa.ru/olymp/"
+        },
+        {
+          "title": "Задания прошлых лет",
+          "url": "https://www.ranepa.ru/olymp/"
         }
       ],
       "regStartDate": "2026-09-01",
@@ -301,6 +333,10 @@ const APP_DATA = {
       "links": [
         {
           "title": "Сайт олимпиады",
+          "url": "https://olymp.mgimo.ru"
+        },
+        {
+          "title": "Задания прошлых лет",
           "url": "https://olymp.mgimo.ru"
         }
       ],
@@ -323,6 +359,10 @@ const APP_DATA = {
         {
           "title": "Сайт университета",
           "url": "https://usla.ru/"
+        },
+        {
+          "title": "Задания прошлых лет",
+          "url": "https://usla.ru/"
         }
       ],
       "regStartDate": "2026-10-01",
@@ -344,6 +384,10 @@ const APP_DATA = {
         {
           "title": "Сайт олимпиады",
           "url": "https://мош.цпм.рф"
+        },
+        {
+          "title": "Задания прошлых лет",
+          "url": "https://мош.цпм.рф"
         }
       ],
       "regStartDate": "2026-09-01",
@@ -364,6 +408,10 @@ const APP_DATA = {
       "links": [
         {
           "title": "Сайт олимпиады",
+          "url": "https://pvg.mk.ru"
+        },
+        {
+          "title": "Задания прошлых лет",
           "url": "https://pvg.mk.ru"
         }
       ],
@@ -390,6 +438,10 @@ const APP_DATA = {
         {
           "title": "Сайт ТГУ",
           "url": "https://www.tsu.ru/"
+        },
+        {
+          "title": "Задания прошлых лет",
+          "url": "https://www.tsu.ru/"
         }
       ],
       "regStartDate": null,
@@ -415,6 +467,10 @@ const APP_DATA = {
         {
           "title": "Сайт РСОШ",
           "url": "https://rsr-olymp.ru/"
+        },
+        {
+          "title": "Задания прошлых лет",
+          "url": "https://urfu.ru/"
         }
       ],
       "regStartDate": null,
@@ -440,6 +496,10 @@ const APP_DATA = {
         {
           "title": "Сайт РСОШ",
           "url": "https://rsr-olymp.ru/"
+        },
+        {
+          "title": "Задания прошлых лет",
+          "url": "https://kpfu.ru/olymp"
         }
       ],
       "regStartDate": null,
@@ -465,6 +525,10 @@ const APP_DATA = {
         {
           "title": "Сайт РСОШ",
           "url": "https://rsr-olymp.ru/"
+        },
+        {
+          "title": "Задания прошлых лет",
+          "url": "https://www.unn.ru/"
         }
       ],
       "regStartDate": null,
@@ -490,6 +554,10 @@ const APP_DATA = {
         {
           "title": "Сайт РСОШ",
           "url": "https://rsr-olymp.ru/"
+        },
+        {
+          "title": "Задания прошлых лет",
+          "url": "https://www.dvfu.ru/"
         }
       ],
       "regStartDate": null,
