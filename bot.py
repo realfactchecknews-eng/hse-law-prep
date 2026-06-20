@@ -110,6 +110,10 @@ async def cmd_list(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         suffix = f"  ({format_days(d)})" if d is not None else ""
         label = f"{prefix}{o['name']}{suffix}"
         buttons.append([InlineKeyboardButton(label, callback_data=f"toggle_{o['id']}")])
+    buttons.append([
+        InlineKeyboardButton("✅ Подписаться на все", callback_data="sub_all"),
+        InlineKeyboardButton("❌ Отписаться от всех", callback_data="unsub_all"),
+    ])
 
     await update.message.reply_text(
         "Нажми на олимпиаду чтобы подписаться или отписаться:\n"
@@ -193,6 +197,42 @@ async def callback_toggle(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await cmd_list_from_msg(query.message, user_id)
 
 
+async def callback_sub_all(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    user_id = query.from_user.id
+    subs = set(db.get_user_subs(user_id))
+    added = 0
+    for o in OLYMPIADS:
+        if o["id"] not in subs:
+            db.subscribe(user_id, o["id"])
+            added += 1
+    await query.edit_message_reply_markup(reply_markup=None)
+    if added:
+        msg = f"✅ Подписался на все олимпиады — {len(OLYMPIADS)} шт.\nБуду напоминать за 30, 7 и 1 день до открытия регистрации."
+    else:
+        msg = "✅ Ты уже подписан(а) на все олимпиады."
+    await query.message.reply_text(msg, parse_mode="Markdown", reply_markup=MAIN_KEYBOARD)
+    await cmd_list_from_msg(query.message, user_id)
+
+
+async def callback_unsub_all(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    user_id = query.from_user.id
+    subs = db.get_user_subs(user_id)
+    count = len(subs)
+    for oid in subs:
+        db.unsubscribe(user_id, oid)
+    await query.edit_message_reply_markup(reply_markup=None)
+    if count:
+        msg = f"❌ Отписался от всех олимпиад ({count} шт.)."
+    else:
+        msg = "У тебя не было активных подписок."
+    await query.message.reply_text(msg, parse_mode="Markdown", reply_markup=MAIN_KEYBOARD)
+    await cmd_list_from_msg(query.message, user_id)
+
+
 async def cmd_list_from_msg(message, user_id: int):
     subs = set(db.get_user_subs(user_id))
     buttons = []
@@ -204,6 +244,10 @@ async def cmd_list_from_msg(message, user_id: int):
         label = f"{prefix}{o['name']}{suffix}"
         buttons.append([InlineKeyboardButton(label, callback_data=f"toggle_{o['id']}")])
 
+    buttons.append([
+        InlineKeyboardButton("✅ Подписаться на все", callback_data="sub_all"),
+        InlineKeyboardButton("❌ Отписаться от всех", callback_data="unsub_all"),
+    ])
     await message.reply_text(
         "Актуальный список:\n✅ — подписан  |  🔔 — не подписан",
         reply_markup=InlineKeyboardMarkup(buttons),
@@ -324,6 +368,8 @@ def main():
     app.add_handler(CommandHandler("open", cmd_open))
     app.add_handler(CommandHandler("help", cmd_help))
     app.add_handler(CallbackQueryHandler(callback_toggle, pattern=r"^toggle_"))
+    app.add_handler(CallbackQueryHandler(callback_sub_all, pattern=r"^sub_all$"))
+    app.add_handler(CallbackQueryHandler(callback_unsub_all, pattern=r"^unsub_all$"))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
     # Daily notifications at 10:00 Moscow time (UTC+3 = 07:00 UTC)
