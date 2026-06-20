@@ -15,7 +15,8 @@ const routes = {
   progress: renderProgress,
   terms: renderTerms,
   checker: renderChecker,
-  olympiad: renderOlympiadDetail
+  olympiad: renderOlympiadDetail,
+  bot: renderBot
 };
 
 /* ===== Progress helpers ===== */
@@ -134,6 +135,22 @@ function renderHome(container) {
       </div>
     </section>
 
+    <div class="bot-cta-banner">
+      <div class="bot-cta-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.16 13.667l-2.965-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.993.892z"/>
+        </svg>
+      </div>
+      <div class="bot-cta-text">
+        <strong>Бот в Telegram</strong>
+        <span>Подпишись на олимпиады — напомним за 30, 7 и 1 день до открытия регистрации</span>
+      </div>
+      <div class="bot-cta-actions">
+        <a class="btn btn-tg" href="https://t.me/pravolymp_bot" target="_blank" rel="noopener">Открыть бота</a>
+        <button class="btn btn-outline-dark" data-goto="bot">Подробнее</button>
+      </div>
+    </div>
+
     <h2 class="section-title">Быстрый доступ</h2>
     <div class="card-grid">
       <div class="card" data-goto="topics">
@@ -174,6 +191,91 @@ function renderHome(container) {
         <h3>Поступление по олимпиадам</h3>
         <p>Значительная часть бюджетных мест в ВШЭ распределяется между победителями и призёрами олимпиад — это реальный путь, если серьёзно готовиться.</p>
       </div>
+    </div>
+  `;
+  bindGoto(container);
+}
+
+/* ===== Render: Bot ===== */
+function renderBot(container) {
+  container.innerHTML = `
+    <h1 class="page-title">Бот «Право Олимп» в Telegram</h1>
+    <p class="page-subtitle">Не пропусти открытие регистрации — бот напомнит сам</p>
+
+    <div class="bot-page-hero">
+      <div class="bot-page-icon">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.16 13.667l-2.965-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.993.892z"/>
+        </svg>
+      </div>
+      <div class="bot-page-hero-text">
+        <h2>@pravolymp_bot</h2>
+        <p>Бесплатный бот для подготовки к олимпиадам по праву. Подпишись на нужные олимпиады и получай уведомления точно в срок — за 30, 7 и 1 день до открытия регистрации.</p>
+        <a class="btn btn-tg btn-lg" href="https://t.me/pravolymp_bot" target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px">
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.16 13.667l-2.965-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.993.892z"/>
+          </svg>
+          Открыть бота в Telegram
+        </a>
+      </div>
+    </div>
+
+    <h2 class="section-title">Что умеет бот</h2>
+    <div class="card-grid">
+      <div class="card bot-feature-card">
+        <div class="bot-feature-icon">🔔</div>
+        <h3>Уведомления о регистрации</h3>
+        <p>Подпишись на олимпиаду — бот пришлёт напоминание за <strong>30 дней</strong>, <strong>7 дней</strong> и <strong>1 день</strong> до ожидаемого открытия регистрации.</p>
+      </div>
+      <div class="card bot-feature-card">
+        <div class="bot-feature-icon">📋</div>
+        <h3>Мои подписки</h3>
+        <p>Видишь все свои подписки и сколько дней осталось до открытия. Одна кнопка — и весь список перед тобой.</p>
+      </div>
+      <div class="card bot-feature-card">
+        <div class="bot-feature-icon">✅</div>
+        <h3>Подписка на все сразу</h3>
+        <p>Подпишись на все ${APP_DATA.olympiads.length} олимпиад одним нажатием — или на каждую отдельно. Также легко отписаться от всех разом.</p>
+      </div>
+      <div class="card bot-feature-card">
+        <div class="bot-feature-icon">📅</div>
+        <h3>Открытые регистрации</h3>
+        <p>Узнай какие регистрации уже идут и что открывается в ближайшие 2 недели — одна кнопка «Открытые сейчас».</p>
+      </div>
+    </div>
+
+    <h2 class="section-title">Как начать</h2>
+    <div class="bot-steps">
+      <div class="bot-step">
+        <div class="bot-step-num">1</div>
+        <div class="bot-step-text">
+          <strong>Открой бота</strong>
+          <span>Нажми кнопку ниже или найди <a href="https://t.me/pravolymp_bot" target="_blank" rel="noopener">@pravolymp_bot</a> в Telegram</span>
+        </div>
+      </div>
+      <div class="bot-step">
+        <div class="bot-step-num">2</div>
+        <div class="bot-step-text">
+          <strong>Нажми «Все олимпиады»</strong>
+          <span>Выбери нужные олимпиады или подпишись на все сразу одной кнопкой</span>
+        </div>
+      </div>
+      <div class="bot-step">
+        <div class="bot-step-num">3</div>
+        <div class="bot-step-text">
+          <strong>Получай напоминания</strong>
+          <span>Бот сам напомнит когда открывается регистрация — не пропустишь дедлайн</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bot-cta-final">
+      <a class="btn btn-tg btn-lg" href="https://t.me/pravolymp_bot" target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px">
+          <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.16 13.667l-2.965-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.993.892z"/>
+        </svg>
+        Открыть @pravolymp_bot
+      </a>
     </div>
   `;
   bindGoto(container);
