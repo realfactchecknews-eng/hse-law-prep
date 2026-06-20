@@ -13,7 +13,8 @@ const routes = {
   tests: renderTests,
   test: renderTest,
   progress: renderProgress,
-  terms: renderTerms
+  terms: renderTerms,
+  checker: renderChecker
 };
 
 /* ===== Progress helpers ===== */
@@ -151,6 +152,10 @@ function renderHome(container) {
       <div class="card" data-goto="universities">
         <h3>ВУЗы</h3>
         <p>Куда поступать на юриспруденцию: ВШЭ, МГУ, СПбГУ, МГЮА, РГУП, УрГЮУ и другие вузы.</p>
+      </div>
+      <div class="card" data-goto="checker">
+        <h3>Мои льготы</h3>
+        <p>Есть диплом олимпиады? Введи — и узнаешь все вузы, которые его принимают, и что именно он даёт.</p>
       </div>
     </div>
 
@@ -642,6 +647,86 @@ function renderTerms(container) {
       </div>
     </div>
   `;
+}
+
+/* ===== Render: Checker (льготы по диплому) ===== */
+function renderChecker(container) {
+  const options = APP_DATA.olympiads
+    .map(o => `<option value="${o.id}">${o.name} — ${o.level}</option>`)
+    .join('');
+
+  container.innerHTML = `
+    <h1 class="page-title">Мои льготы</h1>
+    <p class="page-subtitle">Выберите олимпиаду — и сайт покажет все вузы, которые её принимают, и что именно она даёт в каждом из них.</p>
+
+    <div class="checker-form">
+      <select id="checkerSelect" class="checker-select">
+        <option value="">— Выберите олимпиаду —</option>
+        ${options}
+      </select>
+    </div>
+
+    <div id="checkerResults"></div>
+  `;
+
+  document.getElementById('checkerSelect').addEventListener('change', function() {
+    const olympiad = APP_DATA.olympiads.find(o => o.id === this.value);
+    showCheckerResults(document.getElementById('checkerResults'), olympiad);
+  });
+}
+
+function showCheckerResults(container, olympiad) {
+  if (!olympiad) { container.innerHTML = ''; return; }
+
+  const matching = APP_DATA.universities.filter(u =>
+    u.olympiads && u.olympiads.toLowerCase().includes(olympiad.name.toLowerCase())
+  );
+
+  const uniCards = matching.map(u => {
+    const context = extractOlympiadContext(u.olympiads, olympiad.name);
+    return `
+      <div class="checker-uni-card">
+        <div class="checker-uni-header">
+          <div>
+            <h3 class="checker-uni-name">${u.name}</h3>
+            <span class="badge">${u.city}</span>
+            <span class="badge badge-accent">${u.program}</span>
+          </div>
+          <a class="btn btn-outline" href="${u.site}" target="_blank" rel="noopener" style="flex-shrink:0">Сайт</a>
+        </div>
+        ${context ? `<div class="checker-context"><strong>Принимаемый профиль:</strong> ${context}</div>` : ''}
+        <div class="checker-note">${u.note}</div>
+        <div class="checker-ege"><strong>Проходной балл ЕГЭ (ориентир):</strong> ${u.budgetEge}</div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="checker-olympiad-info">
+      <div class="checker-olympiad-header">
+        <h2>${olympiad.name}</h2>
+        <span class="badge badge-accent">${olympiad.level}</span>
+      </div>
+      <p><strong>Предметы:</strong> ${olympiad.subject}</p>
+      <p><strong>Классы:</strong> ${olympiad.grades}</p>
+      <div class="checker-benefits-box">
+        <strong>Что даёт:</strong><br>${olympiad.benefits}
+      </div>
+    </div>
+
+    <h2 class="section-title" style="margin-top:32px">
+      Вузы, принимающие эту олимпиаду
+      <span class="badge" style="margin-left:10px;font-size:0.85rem">${matching.length}</span>
+    </h2>
+    ${matching.length > 0 ? uniCards : '<p class="checker-empty">По нашей базе ни один вуз не указан для этой олимпиады. Проверьте на сайтах вузов напрямую.</p>'}
+  `;
+}
+
+function extractOlympiadContext(olympiadsList, name) {
+  if (!olympiadsList) return '';
+  const pattern = new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*\\([^)]*\\)', 'i');
+  const match = olympiadsList.match(pattern);
+  return match ? match[0] : '';
 }
 
 /* ===== AI-юрист: плавающий чат ===== */
