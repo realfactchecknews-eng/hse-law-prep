@@ -30,7 +30,8 @@ const APP_DATA = {
         }
       ],
       "regStartDate": "2026-08-15",
-      "regStartNote": "Ориентировочно. Точные даты появятся на сайте в конце лета."
+      "regStartNote": "Ориентировочно. Точные даты появятся на сайте в конце лета.",
+      "searchAlias": "Высшая проба"
     },
     {
       "id": "vso-pravo",
@@ -54,7 +55,8 @@ const APP_DATA = {
         }
       ],
       "regStartDate": null,
-      "regStartNote": "Регистрация через школу; сроки устанавливают региональные организаторы. Следите за объявлениями в школе и на сайте РСОШ."
+      "regStartNote": "Регистрация через школу; сроки устанавливают региональные организаторы. Следите за объявлениями в школе и на сайте РСОШ.",
+      "searchAlias": "ВСОШ"
     },
     {
       "id": "lomonosov",
@@ -82,7 +84,8 @@ const APP_DATA = {
         }
       ],
       "regStartDate": "2026-10-01",
-      "regStartNote": "Ориентировочно. Точные даты появятся на сайте olymp.msu.ru осенью."
+      "regStartNote": "Ориентировочно. Точные даты появятся на сайте olymp.msu.ru осенью.",
+      "searchAlias": "Ломоносов"
     },
     {
       "id": "spbu",
@@ -110,7 +113,8 @@ const APP_DATA = {
         }
       ],
       "regStartDate": "2026-10-25",
-      "regStartNote": "Ориентировочно. Точные даты появятся на сайте olympiada.spbu.ru осенью."
+      "regStartNote": "Ориентировочно. Точные даты появятся на сайте olympiada.spbu.ru осенью.",
+      "searchAlias": "Олимпиада СПбГУ"
     },
     {
       "id": "kutafin",
@@ -134,7 +138,8 @@ const APP_DATA = {
         }
       ],
       "regStartDate": "2026-09-01",
-      "regStartNote": "Ориентировочно. Точные даты появятся на сайте msal.ru в начале осени."
+      "regStartNote": "Ориентировочно. Точные даты появятся на сайте msal.ru в начале осени.",
+      "searchAlias": "Кутафинская"
     },
     {
       "id": "femida",
@@ -162,7 +167,8 @@ const APP_DATA = {
         }
       ],
       "regStartDate": "2026-10-01",
-      "regStartNote": "Ориентировочно. Регистрация традиционно открывается 1 октября на olymp.rgup.ru."
+      "regStartNote": "Ориентировочно. Регистрация традиционно открывается 1 октября на olymp.rgup.ru.",
+      "searchAlias": "ФЕМИДА"
     },
     {
       "id": "v-mir-prava",
@@ -186,7 +192,8 @@ const APP_DATA = {
         }
       ],
       "regStartDate": "2026-10-15",
-      "regStartNote": "Ориентировочно. Точные даты появятся на сайте olimp.rpa-mu.ru осенью."
+      "regStartNote": "Ориентировочно. Точные даты появятся на сайте olimp.rpa-mu.ru осенью.",
+      "searchAlias": "В мир права"
     },
     {
       "id": "tolstovsky",
@@ -210,7 +217,8 @@ const APP_DATA = {
         }
       ],
       "regStartDate": "2026-12-01",
-      "regStartNote": "Ориентировочно. Регистрация традиционно открывается 1 декабря на olymp.tsput.ru."
+      "regStartNote": "Ориентировочно. Регистрация традиционно открывается 1 декабря на olymp.tsput.ru.",
+      "searchAlias": "Толстовская"
     },
     {
       "id": "mission",
@@ -234,7 +242,8 @@ const APP_DATA = {
         }
       ],
       "regStartDate": "2026-09-15",
-      "regStartNote": "Ориентировочно. Точные даты появятся на сайте fa.ru в середине сентября."
+      "regStartNote": "Ориентировочно. Точные даты появятся на сайте fa.ru в середине сентября.",
+      "searchAlias": "Миссия выполнима"
     },
     {
       "id": "vernadsky",
@@ -254,7 +263,8 @@ const APP_DATA = {
         }
       ],
       "regStartDate": "2026-09-01",
-      "regStartNote": "Ориентировочно. Точные даты появятся на сайте vernadsky.online осенью."
+      "regStartNote": "Ориентировочно. Точные даты появятся на сайте vernadsky.online осенью.",
+      "searchAlias": "Вернадского"
     },
     {
       "id": "ranepa",
@@ -274,7 +284,8 @@ const APP_DATA = {
         }
       ],
       "regStartDate": "2026-09-01",
-      "regStartNote": "Ориентировочно. Точные даты появятся на сайте ranepa.ru осенью."
+      "regStartNote": "Ориентировочно. Точные даты появятся на сайте ranepa.ru осенью.",
+      "searchAlias": "Олимпиада РАНХиГС"
     },
     {
       "id": "mgimo",
@@ -294,7 +305,8 @@ const APP_DATA = {
         }
       ],
       "regStartDate": "2026-10-01",
-      "regStartNote": "Ориентировочно. Точные даты появятся на сайте olymp.mgimo.ru осенью."
+      "regStartNote": "Ориентировочно. Точные даты появятся на сайте olymp.mgimo.ru осенью.",
+      "searchAlias": "Олимпиада МГИМО"
     },
     {
       "id": "uriyu",
@@ -314,7 +326,8 @@ const APP_DATA = {
         }
       ],
       "regStartDate": "2026-10-01",
-      "regStartNote": "Ориентировочно. Точные даты появятся на сайте usla.ru осенью."
+      "regStartNote": "Ориентировочно. Точные даты появятся на сайте usla.ru осенью.",
+      "searchAlias": "Юридические высоты"
     },
     {
       "id": "mosh",
@@ -334,7 +347,8 @@ const APP_DATA = {
         }
       ],
       "regStartDate": "2026-09-01",
-      "regStartNote": "Ориентировочно. Точные даты появятся на сайте мош.цпм.рф в начале осени."
+      "regStartNote": "Ориентировочно. Точные даты появятся на сайте мош.цпм.рф в начале осени.",
+      "searchAlias": "МОШ"
     },
     {
       "id": "pokori-vorobevy",
@@ -354,7 +368,8 @@ const APP_DATA = {
         }
       ],
       "regStartDate": "2026-10-01",
-      "regStartNote": "Ориентировочно. Точные даты появятся на сайте pvg.mk.ru осенью."
+      "regStartNote": "Ориентировочно. Точные даты появятся на сайте pvg.mk.ru осенью.",
+      "searchAlias": "Покори Воробьёвы горы"
     }
   ],
   "topics": [

@@ -748,39 +748,76 @@ function renderTerms(container) {
 
 /* ===== Render: Checker (льготы по диплому) ===== */
 function renderChecker(container) {
-  const options = APP_DATA.olympiads
+  const olympiadOptions = APP_DATA.olympiads
     .map(o => `<option value="${o.id}">${o.name} — ${o.level}</option>`)
+    .join('');
+  const uniOptions = APP_DATA.universities
+    .map(u => `<option value="${u.id}">${u.name}</option>`)
     .join('');
 
   container.innerHTML = `
     <h1 class="page-title">Мои льготы</h1>
-    <p class="page-subtitle">Выберите олимпиаду — и сайт покажет все вузы, которые её принимают, и что именно она даёт в каждом из них.</p>
+    <p class="page-subtitle">Проверьте, какие льготы даёт ваша олимпиада — или какие олимпиады принимает нужный вуз.</p>
 
-    <div class="checker-form">
+    <div class="checker-mode-switcher">
+      <button class="checker-mode-btn active" id="modeOlympiad">🏆 По олимпиаде</button>
+      <button class="checker-mode-btn" id="modeUni">🏛 По вузу</button>
+    </div>
+
+    <div id="checkerPanelOlympiad" class="checker-form">
       <select id="checkerSelect" class="checker-select">
         <option value="">— Выберите олимпиаду —</option>
-        ${options}
+        ${olympiadOptions}
+      </select>
+    </div>
+
+    <div id="checkerPanelUni" class="checker-form" style="display:none">
+      <select id="checkerUniSelect" class="checker-select">
+        <option value="">— Выберите вуз —</option>
+        ${uniOptions}
       </select>
     </div>
 
     <div id="checkerResults"></div>
   `;
 
+  const results = document.getElementById('checkerResults');
+  const panelO = document.getElementById('checkerPanelOlympiad');
+  const panelU = document.getElementById('checkerPanelUni');
+  const btnO = document.getElementById('modeOlympiad');
+  const btnU = document.getElementById('modeUni');
+
+  btnO.addEventListener('click', () => {
+    btnO.classList.add('active'); btnU.classList.remove('active');
+    panelO.style.display = ''; panelU.style.display = 'none';
+    results.innerHTML = '';
+  });
+  btnU.addEventListener('click', () => {
+    btnU.classList.add('active'); btnO.classList.remove('active');
+    panelU.style.display = ''; panelO.style.display = 'none';
+    results.innerHTML = '';
+  });
+
   document.getElementById('checkerSelect').addEventListener('change', function() {
     const olympiad = APP_DATA.olympiads.find(o => o.id === this.value);
-    showCheckerResults(document.getElementById('checkerResults'), olympiad);
+    showCheckerResults(results, olympiad);
+  });
+  document.getElementById('checkerUniSelect').addEventListener('change', function() {
+    const uni = APP_DATA.universities.find(u => u.id === this.value);
+    showUniversityResults(results, uni);
   });
 }
 
 function showCheckerResults(container, olympiad) {
   if (!olympiad) { container.innerHTML = ''; return; }
 
+  const alias = olympiad.searchAlias || olympiad.name;
   const matching = APP_DATA.universities.filter(u =>
-    u.olympiads && u.olympiads.toLowerCase().includes(olympiad.name.toLowerCase())
+    u.olympiads && u.olympiads.toLowerCase().includes(alias.toLowerCase())
   );
 
   const uniCards = matching.map(u => {
-    const context = extractOlympiadContext(u.olympiads, olympiad.name);
+    const context = extractOlympiadContext(u.olympiads, alias);
     return `
       <div class="checker-uni-card">
         <div class="checker-uni-header">
@@ -819,11 +856,90 @@ function showCheckerResults(container, olympiad) {
   `;
 }
 
-function extractOlympiadContext(olympiadsList, name) {
+function extractOlympiadContext(olympiadsList, alias) {
   if (!olympiadsList) return '';
-  const pattern = new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*\\([^)]*\\)', 'i');
+  const escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const pattern = new RegExp(escaped + '[^,(]*(?:\\([^)]*\\))?', 'i');
   const match = olympiadsList.match(pattern);
-  return match ? match[0] : '';
+  return match ? match[0].trim() : '';
+}
+
+function parseUniversityOlympiads(str) {
+  if (!str) return [];
+  const results = [];
+  // Split on ", " that is NOT inside parentheses
+  const tokens = str.split(/,\s*(?![^(]*\))/);
+  for (const token of tokens) {
+    const t = token.trim();
+    const m = t.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+    if (m) {
+      results.push({ rawName: m[1].trim(), profile: m[2].trim() });
+    } else if (t) {
+      results.push({ rawName: t, profile: null });
+    }
+  }
+  return results;
+}
+
+function findOlympiadByAlias(rawName) {
+  const q = rawName.toLowerCase().trim();
+  return APP_DATA.olympiads.find(o => {
+    const alias = (o.searchAlias || o.name).toLowerCase();
+    return alias === q || q.includes(alias) || alias.includes(q);
+  });
+}
+
+function showUniversityResults(container, uni) {
+  if (!uni) { container.innerHTML = ''; return; }
+
+  const entries = parseUniversityOlympiads(uni.olympiads);
+
+  const olympiadCards = entries.map(({ rawName, profile }) => {
+    const o = findOlympiadByAlias(rawName);
+    const profileBadge = profile ? `<span class="badge" style="margin-left:6px">${profile}</span>` : '';
+    if (o) {
+      return `
+        <div class="checker-uni-card" style="cursor:pointer" data-goto="olympiad/${o.id}">
+          <div class="checker-uni-header">
+            <div>
+              <h3 class="checker-uni-name">${o.name}${profileBadge}</h3>
+              <span class="badge badge-accent">${o.level}</span>
+            </div>
+            <button class="btn btn-outline" data-goto="olympiad/${o.id}" style="flex-shrink:0">Подробнее</button>
+          </div>
+          <div class="checker-note">${o.benefits}</div>
+        </div>
+      `;
+    }
+    return `
+      <div class="checker-uni-card">
+        <div class="checker-uni-header">
+          <div>
+            <h3 class="checker-uni-name">${rawName}${profileBadge}</h3>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="checker-olympiad-info">
+      <div class="checker-olympiad-header">
+        <h2>${uni.name}</h2>
+        <span class="badge">${uni.city}</span>
+      </div>
+      <p><strong>Программа:</strong> ${uni.program}</p>
+      <p><strong>Проходной балл ЕГЭ (ориентир):</strong> ${uni.budgetEge}</p>
+      <div class="checker-benefits-box">${uni.note}</div>
+    </div>
+
+    <h2 class="section-title" style="margin-top:32px">
+      Принимаемые олимпиады
+      <span class="badge" style="margin-left:10px;font-size:0.85rem">${entries.length}</span>
+    </h2>
+    ${entries.length > 0 ? olympiadCards : '<p class="checker-empty">Данные об олимпиадах для этого вуза не указаны.</p>'}
+  `;
+  bindGoto(container);
 }
 
 /* ===== AI-юрист: плавающий чат ===== */

@@ -1051,8 +1051,37 @@ main {
 .olympiad-tg-link:hover { opacity: 0.88; }
 
 /* ===== Checker: Мои льготы ===== */
+.checker-mode-switcher {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0 0;
+}
+
+.checker-mode-btn {
+  padding: 10px 22px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.checker-mode-btn.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.checker-mode-btn:hover:not(.active) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
 .checker-form {
-  margin: 28px 0 32px;
+  margin: 16px 0 32px;
 }
 
 .checker-select {
