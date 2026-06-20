@@ -24,7 +24,7 @@ import db
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-SITE_URL = "https://realfactchecknews-eng.github.io/hse-law-prep/"
+SITE_URL = "https://pravolymp.ru"
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
