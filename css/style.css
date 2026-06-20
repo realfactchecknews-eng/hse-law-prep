@@ -974,6 +974,82 @@ main {
 }
 }
 
+/* ===== Olympiad Detail ===== */
+.olympiad-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.olympiad-reg-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.olympiad-reg-school {
+  border-left-color: var(--text-secondary);
+}
+
+.olympiad-reg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.olympiad-reg-date {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.olympiad-reg-note {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.olympiad-reg-countdown {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.olympiad-reg-neutral { background: var(--bg); color: var(--text-secondary); }
+.olympiad-reg-active  { background: #d1fae5; color: #065f46; }
+.olympiad-reg-today   { background: #fef9c3; color: #713f12; }
+.olympiad-reg-soon    { background: #fee2e2; color: #991b1b; }
+.olympiad-reg-near    { background: #fef3c7; color: #92400e; }
+
+.olympiad-tg-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #2AABEE;
+  color: #fff;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity var(--transition);
+  width: fit-content;
+}
+
+.olympiad-tg-link:hover { opacity: 0.88; }
+
 /* ===== Checker: Мои льготы ===== */
 .checker-form {
   margin: 28px 0 32px;

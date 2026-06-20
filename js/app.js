@@ -14,7 +14,8 @@ const routes = {
   test: renderTest,
   progress: renderProgress,
   terms: renderTerms,
-  checker: renderChecker
+  checker: renderChecker,
+  olympiad: renderOlympiadDetail
 };
 
 /* ===== Progress helpers ===== */
@@ -180,29 +181,125 @@ function renderHome(container) {
 
 /* ===== Render: Olympiads ===== */
 function renderOlympiads(container) {
-  const cards = APP_DATA.olympiads.map(o => `
-    <div class="card">
-      <h3>${o.name}</h3>
-      <p>${o.format}</p>
-      <div class="meta">
-        <span class="badge">${o.subject}</span>
-        <span class="badge badge-accent">${o.level}</span>
-        <span class="badge badge-success">${o.grades}</span>
+  const cards = APP_DATA.olympiads.map(o => {
+    const daysInfo = o.regStartDate ? olympiadDaysLeft(o.regStartDate) : null;
+    const regBadge = daysInfo !== null
+      ? `<span class="badge ${daysInfo <= 14 ? 'badge-warn' : 'badge-success'}" style="margin-left:auto">` +
+        (daysInfo < 0 ? 'Сезон идёт' : daysInfo === 0 ? 'Сегодня открытие!' : `Регистрация через ${daysInfo} дн.`) +
+        `</span>`
+      : '';
+    return `
+      <div class="card" data-goto="olympiad/${o.id}">
+        <h3>${o.name}</h3>
+        <p>${o.format}</p>
+        <div class="meta">
+          <span class="badge">${o.level}</span>
+          <span class="badge badge-success">${o.grades}</span>
+          ${regBadge}
+        </div>
+        <p style="margin-top:12px;color:var(--text-secondary);font-size:0.88rem">${o.status}</p>
       </div>
-      <p style="margin-top:14px;"><strong>Статус:</strong> ${o.status}</p>
-      <p style="margin-top:8px;"><strong>Этапы:</strong> ${o.stages}</p>
-      <p style="margin-top:8px;"><strong>Льготы:</strong> ${o.benefits}</p>
-      <div class="topic-actions" style="margin-top:18px;">
-        ${o.links.map(l => `<a class="btn btn-outline" href="${l.url}" target="_blank" rel="noopener">${l.title}</a>`).join('')}
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   container.innerHTML = `
     <h1 class="page-title">Олимпиады для поступления на юриспруденцию</h1>
-    <p class="page-subtitle">Перечневые олимпиады по праву, обществознанию, истории и экономике. Указаны ориентировочные сроки регистрации и проведения; точные даты публикуются на официальных сайтах ближе к началу сезона.</p>
+    <p class="page-subtitle">Перечневые олимпиады по праву, обществознанию, истории и экономике. Нажмите на карточку, чтобы открыть страницу олимпиады с датами и льготами.</p>
     <div class="card-grid">${cards}</div>
   `;
+  bindGoto(container);
+}
+
+function olympiadDaysLeft(dateStr) {
+  if (!dateStr) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(dateStr);
+  return Math.round((target - today) / 86400000);
+}
+
+/* ===== Render: Olympiad Detail ===== */
+function renderOlympiadDetail(container, id) {
+  const o = APP_DATA.olympiads.find(x => x.id === id);
+  if (!o) {
+    container.innerHTML = `<div class="topic-detail"><h1 class="page-title">Олимпиада не найдена</h1><button class="btn btn-outline" data-goto="olympiads">← Все олимпиады</button></div>`;
+    bindGoto(container);
+    return;
+  }
+
+  const daysLeft = olympiadDaysLeft(o.regStartDate);
+  let regBlock = '';
+  if (o.regStartDate) {
+    const d = new Date(o.regStartDate);
+    const dateStr = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+    let countdownClass = 'olympiad-reg-neutral';
+    let countdownText = '';
+    if (daysLeft < 0) {
+      countdownText = 'Сезон регистрации идёт (или уже завершён)';
+      countdownClass = 'olympiad-reg-active';
+    } else if (daysLeft === 0) {
+      countdownText = 'Сегодня открытие регистрации!';
+      countdownClass = 'olympiad-reg-today';
+    } else if (daysLeft <= 7) {
+      countdownText = `До открытия регистрации: ${daysLeft} дн.`;
+      countdownClass = 'olympiad-reg-soon';
+    } else if (daysLeft <= 30) {
+      countdownText = `До открытия регистрации: ${daysLeft} дн.`;
+      countdownClass = 'olympiad-reg-near';
+    } else {
+      countdownText = `До открытия регистрации: ${daysLeft} дн.`;
+      countdownClass = 'olympiad-reg-neutral';
+    }
+    regBlock = `
+      <div class="olympiad-reg-block">
+        <div class="olympiad-reg-header">
+          <span>Ожидаемое открытие регистрации</span>
+          <span class="olympiad-reg-countdown ${countdownClass}">${countdownText}</span>
+        </div>
+        <div class="olympiad-reg-date">${dateStr}</div>
+        <div class="olympiad-reg-note">${o.regStartNote}</div>
+        <a class="olympiad-tg-link" href="https://t.me/pravolymp_bot?start=sub_${o.id}" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+          Напомни мне в Telegram
+        </a>
+      </div>
+    `;
+  } else {
+    regBlock = `<div class="olympiad-reg-block olympiad-reg-school"><p>${o.regStartNote || 'Точные даты регистрации уточняйте на официальном сайте.'}</p></div>`;
+  }
+
+  container.innerHTML = `
+    <div class="topic-detail">
+      <button class="btn btn-outline" data-goto="olympiads" style="margin-bottom:20px">← Все олимпиады</button>
+      <h1 class="page-title">${o.name}</h1>
+      <div class="olympiad-badges">
+        <span class="badge badge-accent">${o.level}</span>
+        <span class="badge">${o.grades}</span>
+        <span class="badge">${o.organizer}</span>
+      </div>
+
+      ${regBlock}
+
+      <div class="topic-content">
+        <h3>Предметы</h3>
+        <p>${o.subject}</p>
+
+        <h3>Формат</h3>
+        <p>${o.format}</p>
+
+        <h3>Этапы и сроки</h3>
+        <p>${o.stages}</p>
+
+        <h3>Льготы при поступлении</h3>
+        <p>${o.benefits}</p>
+      </div>
+
+      <div class="topic-actions">
+        ${o.links.map(l => `<a class="btn btn-outline" href="${l.url}" target="_blank" rel="noopener">${l.title}</a>`).join('')}
+      </div>
+    </div>
+  `;
+  bindGoto(container);
 }
 
 /* ===== Render: Universities ===== */

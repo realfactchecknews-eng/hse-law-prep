@@ -1,0 +1,122 @@
+[
+  {
+    "id": "hse-high-proba",
+    "name": "Высшая проба",
+    "level": "1 уровень РСОШ",
+    "regStartDate": "2026-08-15",
+    "regStartNote": "Ориентировочно. Точные даты появятся на сайте в конце лета.",
+    "site": "https://olymp.hse.ru/mmo/law"
+  },
+  {
+    "id": "vso-pravo",
+    "name": "ВСОШ по праву",
+    "level": "Всероссийский уровень",
+    "regStartDate": null,
+    "regStartNote": "Регистрация через школу; сроки устанавливают региональные организаторы.",
+    "site": "https://rsr-olymp.ru/"
+  },
+  {
+    "id": "lomonosov",
+    "name": "Ломоносов",
+    "level": "1 уровень РСОШ",
+    "regStartDate": "2026-10-01",
+    "regStartNote": "Ориентировочно. Точные даты появятся на olymp.msu.ru осенью.",
+    "site": "https://olymp.msu.ru"
+  },
+  {
+    "id": "spbu",
+    "name": "Олимпиада СПбГУ",
+    "level": "1 уровень РСОШ",
+    "regStartDate": "2026-10-25",
+    "regStartNote": "Ориентировочно. Точные даты появятся на olympiada.spbu.ru осенью.",
+    "site": "https://www.olympiada.spbu.ru/"
+  },
+  {
+    "id": "kutafin",
+    "name": "Кутафинская олимпиада",
+    "level": "1 уровень РСОШ",
+    "regStartDate": "2026-09-01",
+    "regStartNote": "Ориентировочно. Точные даты появятся на msal.ru в начале осени.",
+    "site": "https://olympic.msal.ru/"
+  },
+  {
+    "id": "femida",
+    "name": "ФЕМИДА",
+    "level": "2 уровень РСОШ",
+    "regStartDate": "2026-10-01",
+    "regStartNote": "Ориентировочно. Регистрация традиционно открывается 1 октября.",
+    "site": "https://olymp.rgup.ru/"
+  },
+  {
+    "id": "v-mir-prava",
+    "name": "В мир права",
+    "level": "2 уровень РСОШ",
+    "regStartDate": "2026-10-15",
+    "regStartNote": "Ориентировочно. Точные даты появятся на olimp.rpa-mu.ru осенью.",
+    "site": "https://olimp.rpa-mu.ru/"
+  },
+  {
+    "id": "tolstovsky",
+    "name": "Толстовская олимпиада",
+    "level": "3 уровень РСОШ",
+    "regStartDate": "2026-12-01",
+    "regStartNote": "Ориентировочно. Регистрация традиционно открывается 1 декабря.",
+    "site": "https://olymp.tsput.ru/"
+  },
+  {
+    "id": "mission",
+    "name": "Миссия выполнима",
+    "level": "2–3 уровень РСОШ",
+    "regStartDate": "2026-09-15",
+    "regStartNote": "Ориентировочно. Точные даты появятся на fa.ru в середине сентября.",
+    "site": "https://www.fa.ru/for-applicants/olympiads/mission/"
+  },
+  {
+    "id": "vernadsky",
+    "name": "Вернадского",
+    "level": "1 уровень РСОШ",
+    "regStartDate": "2026-09-01",
+    "regStartNote": "Ориентировочно. Точные даты появятся на vernadsky.online осенью.",
+    "site": "https://vernadsky.online"
+  },
+  {
+    "id": "ranepa",
+    "name": "Олимпиада РАНХиГС",
+    "level": "2–3 уровень РСОШ",
+    "regStartDate": "2026-09-01",
+    "regStartNote": "Ориентировочно. Точные даты появятся на ranepa.ru осенью.",
+    "site": "https://www.ranepa.ru/olymp/"
+  },
+  {
+    "id": "mgimo",
+    "name": "Олимпиада МГИМО",
+    "level": "2 уровень РСОШ",
+    "regStartDate": "2026-10-01",
+    "regStartNote": "Ориентировочно. Точные даты появятся на olymp.mgimo.ru осенью.",
+    "site": "https://olymp.mgimo.ru"
+  },
+  {
+    "id": "uriyu",
+    "name": "Юридические высоты",
+    "level": "2 уровень РСОШ",
+    "regStartDate": "2026-10-01",
+    "regStartNote": "Ориентировочно. Точные даты появятся на usla.ru осенью.",
+    "site": "https://usla.ru/"
+  },
+  {
+    "id": "mosh",
+    "name": "МОШ (Московская олимпиада)",
+    "level": "2–3 уровень РСОШ",
+    "regStartDate": "2026-09-01",
+    "regStartNote": "Ориентировочно. Точные даты появятся в начале осени.",
+    "site": "https://мош.цпм.рф"
+  },
+  {
+    "id": "pokori-vorobevy",
+    "name": "Покори Воробьёвы горы!",
+    "level": "1 уровень РСОШ",
+    "regStartDate": "2026-10-01",
+    "regStartNote": "Ориентировочно. Точные даты появятся на pvg.mk.ru осенью.",
+    "site": "https://pvg.mk.ru"
+  }
+]

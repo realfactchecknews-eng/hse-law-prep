@@ -11,3 +11,7 @@ assets/slides/
 generate_data.py
 data/*.txt
 data/expanded_*.json
+
+# Telegram bot secrets and runtime files
+bot/.env
+bot/subscribers.db
