@@ -1463,3 +1463,75 @@ main {
   transform: scale(0.98) translateY(0) !important;
   transition: transform 0.1s ease !important;
 }
+
+/* ===== Theme toggle button ===== */
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), color var(--transition);
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.theme-toggle .icon-sun { display: none; }
+.theme-toggle .icon-moon { display: block; }
+body.dark .theme-toggle .icon-sun { display: block; }
+body.dark .theme-toggle .icon-moon { display: none; }
+
+/* ===== Dark theme ===== */
+body.dark {
+  --bg: #0e1117;
+  --surface: #1a1d2e;
+  --text: #e2e8f0;
+  --text-secondary: #8b95a6;
+  --border: #2d3454;
+  --primary: #4f8ef7;
+  --primary-light: #1a2d50;
+  --accent: #f87171;
+  --accent-light: #3b1515;
+  --success: #34d399;
+  --success-light: #0d3b2e;
+  --warning: #fbbf24;
+  --warning-light: #2d1f00;
+  --shadow: 0 4px 20px rgba(0,0,0,0.45);
+  --shadow-hover: 0 8px 30px rgba(0,0,0,0.65);
+}
+
+body.dark .hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+}
+
+body.dark .ai-message-system .ai-message-content,
+body.dark .ai-message-assistant .ai-message-content {
+  background: #242840;
+  border-color: var(--border);
+}
+
+body.dark .ai-chat-input {
+  background: var(--bg);
+}
+
+body.dark .ai-chat-send:hover {
+  background: #3b70e0;
+}
+
+body.dark .olympiad-reg-active { background: #0d3b2e; color: #34d399; }
+body.dark .olympiad-reg-today  { background: #2d1f00; color: #fbbf24; }
+body.dark .olympiad-reg-soon   { background: #3b1515; color: #f87171; }
+body.dark .olympiad-reg-near   { background: #2a1800; color: #fb923c; }
+
+/* Smooth transition when switching themes */
+.theme-transitioning,
+.theme-transitioning *:not(.loader-dots span):not(.ai-chat-typing span) {
+  transition: background-color 0.3s ease, color 0.25s ease,
+              border-color 0.3s ease, box-shadow 0.3s ease !important;
+}

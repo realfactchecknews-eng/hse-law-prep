@@ -1254,9 +1254,20 @@ function initAIChat() {
   }
 }
 
+/* ===== Theme ===== */
+function initTheme() {
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    document.body.classList.add('theme-transitioning');
+    const isDark = document.body.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    setTimeout(() => document.body.classList.remove('theme-transitioning'), 350);
+  });
+}
+
 /* ===== Init ===== */
 document.addEventListener('DOMContentLoaded', () => {
   initRouter();
+  initTheme();
   initAIChat();
   document.querySelector('footer').addEventListener('click', (e) => {
     const a = e.target.closest('a[data-route]');
