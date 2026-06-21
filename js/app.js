@@ -1,3 +1,5 @@
+const PAGE_START = performance.now();
+
 /* ===== State ===== */
 const state = {
   currentRoute: 'home',
@@ -76,8 +78,11 @@ function handleRoute() {
   state.currentRoute = route;
   const renderer = routes[route] || renderHome;
   const app = document.getElementById('app');
+  app.classList.remove('page-enter');
   app.innerHTML = '';
   renderer(app, param);
+  void app.offsetHeight;
+  app.classList.add('page-enter');
   updateActiveNav();
   window.scrollTo(0, 0);
 }
@@ -1260,4 +1265,9 @@ document.addEventListener('DOMContentLoaded', () => {
       navigate(a.dataset.route);
     }
   });
+
+  const elapsed = performance.now() - PAGE_START;
+  setTimeout(() => {
+    document.getElementById('page-loader')?.classList.add('hidden');
+  }, Math.max(0, 600 - elapsed));
 });
