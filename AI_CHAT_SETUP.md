@@ -1,79 +1,70 @@
-# Настройка AI-юриста на сайте
+# Настройка AI-юриста на сайте (Cloudflare Pages)
 
-Сайт уже содержит frontend-попап чата. Для работы нужно развернуть бесплатный прокси на Cloudflare Workers и добавить туда API-ключ OpenRouter.
+AI-юрист работает через **Cloudflare Pages Function** — файл `functions/api/chat.js` в репозитории автоматически обслуживает маршрут `/api/chat` на том же домене. Ключ OpenRouter хранится в env-переменной Cloudflare (не в коде).
 
 ## Почему нельзя хранить ключ в JS
 
-GitHub Pages отдаёт сайт как статические файлы. Любой API-ключ, записанный в `js/data.js` или `js/config.js`, будет виден всем посетителям в DevTools. Поэтому запросы к OpenRouter идут через прокси, а ключ хранится в секретах Cloudflare.
+Файлы, которые браузер загружает со статического сайта (`js/data.js`, `js/config.js`, `js/app.js`), видны всем через DevTools. Поэтому запрос к OpenRouter делается через серверную функцию, а ключ хранится в секретах Cloudflare — браузер его никогда не видит.
 
 ## Шаг 1: Зарегистрироваться на OpenRouter
 
 1. Откройте <https://openrouter.ai/>.
 2. Зарегистрируйтесь и пополните баланс (минимум несколько долларов).
 3. Создайте API-ключ: <https://openrouter.ai/settings/keys>.
-4. Скопируйте ключ — он понадобится на шаге 3.
+4. Скопируйте ключ — он понадобится на шаге 2.
 
-## Шаг 2: Развернуть Cloudflare Worker
+## Шаг 2: Добавить переменные в Cloudflare Pages
 
-1. Зарегистрируйтесь на <https://workers.cloudflare.com/> (бесплатный план даёт 100 000 запросов в день).
-2. В Dashboard перейдите в **Workers & Pages** → **Create application** → **Create Worker**.
-3. Дайте Worker имя, например `hse-law-prep-ai`.
-4. В редакторе кода замените содержимое на код из файла `workers/ai-proxy.js` в репозитории.
-5. Нажмите **Save and deploy**.
-6. Скопируйте URL Worker (например, `https://hse-law-prep-ai.your-subdomain.workers.dev`).
+1. Откройте проект в Cloudflare Dashboard → **Settings** → **Environment variables**.
+2. Нажмите **Add variable** и добавьте:
 
-## Шаг 3: Добавить секреты и переменные
+   | Variable name         | Value                        | Encrypt |
+   |-----------------------|------------------------------|---------|
+   | `OPENROUTER_API_KEY`  | ваш ключ из OpenRouter       | ✅ да   |
+   | `ALLOWED_ORIGINS`     | `https://pravolymp.ru`       | нет     |
 
-1. В настройках Worker перейдите в **Settings** → **Variables and Secrets**.
-2. Нажмите **Add**.
-3. Создайте секрет:
-   - **Variable name**: `OPENROUTER_API_KEY`
-   - **Value**: ваш ключ из OpenRouter
-   - **Encrypt**: включено (🔒)
-4. Создайте переменную:
-   - **Variable name**: `ALLOWED_ORIGINS`
-   - **Value**: список источников через запятую, например:
-     ```
-     https://realfactchecknews-eng.github.io,http://localhost:8000
-     ```
-   - **Encrypt**: выключено
-5. Нажмите **Deploy**.
+3. Нажмите **Save and deploy** — Cloudflare пересоберёт сайт с новыми переменными.
 
-## Шаг 4: Указать URL прокси на сайте
+> Если тестируете локально, добавьте в `ALLOWED_ORIGINS` через запятую: `https://pravolymp.ru,http://localhost:8000`
 
-1. Откройте файл `js/config.js` в репозитории.
-2. Замените значение `AI_PROXY_URL` на URL вашего Worker:
-   ```js
-   const SITE_CONFIG = {
-     AI_PROXY_URL: 'https://hse-law-prep-ai.your-subdomain.workers.dev'
-   };
+## Шаг 3: Привязать домен pravolymp.ru
+
+1. В проекте Pages → **Custom domains** → **Set up a custom domain** → введите `pravolymp.ru`.
+2. Cloudflare покажет CNAME-запись, например:
    ```
-3. Закоммитьте и запушьте изменения.
+   Тип:  CNAME
+   Имя:  pravolymp.ru  (или @)
+   Цель: <ваш-проект>.pages.dev
+   ```
+3. Зайдите в личный кабинет вашего регистратора домена (.ru) → раздел **DNS** → добавьте эту CNAME-запись.
+   - **Переносить домен к Cloudflare не нужно** — .ru домены Cloudflare Registrar не принимает, но это неважно.
+4. Дождитесь выпуска SSL (обычно 5–15 минут после распространения DNS).
 
-## Шаг 5: Проверить работу
+## Шаг 4: Проверить работу
 
-1. Откройте сайт.
-2. Нажмите на кнопку **AI-юрист** в правом нижнем углу.
+1. Откройте `https://pravolymp.ru`.
+2. Нажмите кнопку **AI-юрист** в правом нижнем углу.
 3. Задайте вопрос, например: «Что такое правовая норма?»
-4. Если всё настроено правильно, через несколько секунд придёт ответ.
+4. Через несколько секунд придёт ответ.
+5. В DevTools → Network убедитесь, что запрос уходит на `pravolymp.ru/api/chat` и возвращает 200.
 
 ## Ограничения и безопасность
 
 - История чата хранится только в браузере пользователя (`localStorage`).
 - Ключ OpenRouter не виден посетителям сайта.
-- Для дополнительной защиты можно включить rate limiting в Cloudflare (например, не более 30 запросов в час с одного IP).
-- Используется модель `openai/gpt-4o-mini` — дешёвая и достаточно качественная для юридических вопросов. При желании можно заменить в `workers/ai-proxy.js`.
-
-## Что делать, если не работает
-
-- Откройте DevTools → Console на сайте и посмотрите ошибки.
-- В Cloudflare Dashboard откройте **Real-time logs** Worker и проверьте запросы.
-- Убедитесь, что `ALLOWED_ORIGINS` содержит точный URL сайта (с `https://`).
-- Убедитесь, что `OPENROUTER_API_KEY` добавлен как **Encrypted** секрет.
+- Для дополнительной защиты можно включить Rate Limiting в Cloudflare (Settings проекта).
+- Используется модель `openai/gpt-4o-mini` — дешёвая и качественная. При желании можно заменить в `functions/api/chat.js`.
 
 ## Модель и стоимость
 
 - Модель по умолчанию: `openai/gpt-4o-mini`.
-- Стоимость OpenRouter: <https://openrouter.ai/models/openai/gpt-4o-mini>
 - 1000 вопросов обходятся примерно в $0.30–$0.60.
-- Если хотите ещё дешевле, можно заменить на `meta-llama/llama-3.1-8b-instruct` или `google/gemini-flash-1.5` в `workers/ai-proxy.js`.
+- Альтернативы (дешевле): `meta-llama/llama-3.1-8b-instruct`, `google/gemini-flash-1.5`.
+
+## Что делать, если не работает
+
+- Откройте DevTools → Console на сайте и посмотрите ошибки.
+- В Cloudflare Dashboard → проект Pages → **Functions** → **Real-time logs** проверьте запросы.
+- Убедитесь, что `ALLOWED_ORIGINS` содержит точный URL сайта (с `https://`).
+- Убедитесь, что `OPENROUTER_API_KEY` добавлен с включённым **Encrypt**.
+- После изменения переменных нажмите **Save and deploy** — функции обновляются только при новом деплое.
