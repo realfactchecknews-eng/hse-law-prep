@@ -16,7 +16,8 @@ const routes = {
   terms: renderTerms,
   checker: renderChecker,
   olympiad: renderOlympiadDetail,
-  bot: renderBot
+  bot: renderBot,
+  feedback: renderFeedback
 };
 
 /* ===== Progress helpers ===== */
@@ -1247,6 +1248,79 @@ function initAIChat() {
       console.error('Failed to save AI chat history', e);
     }
   }
+}
+
+/* ===== Render: Feedback ===== */
+function renderFeedback(container) {
+  const hasForm = SITE_CONFIG.FEEDBACK_FORM_URL && SITE_CONFIG.FEEDBACK_FORM_URL.trim() !== '';
+  container.innerHTML = `
+    <div class="page-header">
+      <h1>Предложения и отзывы</h1>
+      <p class="page-subtitle">Помогите сделать платформу лучше — расскажите, что можно улучшить, какие темы добавить или какие ошибки исправить.</p>
+    </div>
+    <div class="card feedback-card">
+      ${hasForm ? `
+      <form id="feedbackForm" class="feedback-form" action="${SITE_CONFIG.FEEDBACK_FORM_URL}" method="POST" novalidate>
+        <div class="feedback-field">
+          <label for="fb-type">Тип обращения</label>
+          <select id="fb-type" name="type" class="feedback-select" required>
+            <option value="">— выберите —</option>
+            <option value="Ошибка или неточность">Ошибка или неточность</option>
+            <option value="Предложение по контенту">Предложение по контенту</option>
+            <option value="Техническая проблема">Техническая проблема</option>
+            <option value="Другое">Другое</option>
+          </select>
+        </div>
+        <div class="feedback-field">
+          <label for="fb-message">Сообщение</label>
+          <textarea id="fb-message" name="message" class="feedback-textarea" rows="5" placeholder="Опишите проблему или предложение как можно подробнее..." required></textarea>
+        </div>
+        <div class="feedback-field">
+          <label for="fb-email">Ваш e-mail <span class="feedback-optional">(необязательно, для ответа)</span></label>
+          <input type="email" id="fb-email" name="email" class="feedback-input" placeholder="example@mail.ru">
+        </div>
+        <button type="submit" class="btn btn-primary feedback-submit">Отправить</button>
+        <div id="feedbackSuccess" class="feedback-success hidden">Спасибо! Сообщение отправлено.</div>
+        <div id="feedbackError" class="feedback-error hidden">Не удалось отправить. Попробуйте позже или напишите на почту напрямую.</div>
+      </form>
+      ` : `
+      <p class="feedback-unavailable">Форма обратной связи временно недоступна.</p>
+      <p>Напишите нам напрямую: <a href="mailto:realfactchecknews@gmail.com">realfactchecknews@gmail.com</a></p>
+      `}
+    </div>
+  `;
+
+  if (!hasForm) return;
+
+  const form = document.getElementById('feedbackForm');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = form.querySelector('.feedback-submit');
+    const successEl = document.getElementById('feedbackSuccess');
+    const errorEl = document.getElementById('feedbackError');
+    btn.disabled = true;
+    btn.textContent = 'Отправка...';
+    successEl.classList.add('hidden');
+    errorEl.classList.add('hidden');
+    try {
+      const res = await fetch(SITE_CONFIG.FEEDBACK_FORM_URL, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: new FormData(form)
+      });
+      if (res.ok) {
+        successEl.classList.remove('hidden');
+        form.reset();
+      } else {
+        errorEl.classList.remove('hidden');
+      }
+    } catch {
+      errorEl.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Отправить';
+    }
+  });
 }
 
 /* ===== Init ===== */
