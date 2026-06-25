@@ -3,5 +3,5 @@
 // Пример: 'https://hse-law-prep-ai.your-subdomain.workers.dev'
 const SITE_CONFIG = {
   AI_PROXY_URL: 'https://pravolymp.ru',
-  FEEDBACK_FORM_URL: ''
+  FEEDBACK_FORM_URL: 'https://formspree.io/f/xqevpybk'
 };
