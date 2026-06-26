@@ -65,7 +65,7 @@ async function handleChat(request, env) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${openRouterKey}`,
-        'HTTP-Referer': 'https://realfactchecknews-eng.github.io/hse-law-prep/',
+        'HTTP-Referer': 'https://pravolymp.ru',
         'X-Title': 'Право olymp AI',
       },
       body: JSON.stringify({
