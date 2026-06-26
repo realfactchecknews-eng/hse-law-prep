@@ -20,7 +20,9 @@ const routes = {
   olympiad: renderOlympiadDetail,
   bot: renderBot,
   practice: renderPractice,
-  feedback: renderFeedback
+  feedback: renderFeedback,
+  glossary: renderGlossary,
+  compare: renderCompare
 };
 
 /* ===== Progress helpers ===== */
@@ -706,6 +708,16 @@ function bindTestForm(test) {
 }
 
 /* ===== Render: Progress ===== */
+function getOlympiadProgress() {
+  try {
+    return JSON.parse(localStorage.getItem('law-prep-olympiad-progress') || '{}');
+  } catch { return {}; }
+}
+
+function saveOlympiadProgress(data) {
+  localStorage.setItem('law-prep-olympiad-progress', JSON.stringify(data));
+}
+
 function renderProgress(container) {
   const completed = state.progress.completedTopics.length;
   const totalTopics = APP_DATA.topics.length;
@@ -728,6 +740,29 @@ function renderProgress(container) {
         <div class="progress-bar"><div style="width:${percent}%"></div></div>
       </div>
     `;
+  }).join('');
+
+  const olympiads = [
+    { id: 'vsosh', name: 'ВсОШ по праву' },
+    { id: 'vp', name: 'Высшая проба' },
+    { id: 'kutafin', name: 'Кутафинская олимпиада' },
+    { id: 'lomonosov', name: 'Ломоносов' },
+    { id: 'spbu', name: 'Олимпиада СПбГУ' },
+    { id: 'vernadsky', name: 'Вернадского' },
+  ];
+  const stages = [
+    { key: 'registered', label: 'Зарегистрировался' },
+    { key: 'qualifying', label: 'Отбор/Заочный' },
+    { key: 'final', label: 'Финал' },
+    { key: 'winner', label: 'Победитель/Призёр' },
+  ];
+  const olympProgress = getOlympiadProgress();
+  const olympRows = olympiads.map(o => {
+    const stageChecks = stages.map(s => {
+      const checked = olympProgress[o.id]?.[s.key] ? 'checked' : '';
+      return `<label class="olymp-stage-label"><input type="checkbox" class="olymp-cb" data-olymp="${o.id}" data-stage="${s.key}" ${checked}><span>${s.label}</span></label>`;
+    }).join('');
+    return `<div class="olymp-progress-row"><div class="olymp-name">${o.name}</div><div class="olymp-stages">${stageChecks}</div></div>`;
   }).join('');
 
   container.innerHTML = `
@@ -753,18 +788,153 @@ function renderProgress(container) {
     </div>
     <h2 class="section-title">По темам</h2>
     <div class="progress-list">${topicRows}</div>
+    <h2 class="section-title" style="margin-top:32px;">Прогресс по олимпиадам</h2>
+    <div class="olymp-progress-table">${olympRows}</div>
     <div class="topic-actions" style="margin-top: 24px;">
-      <button class="btn btn-danger" id="resetProgress">Сбросить прогресс</button>
+      <button class="btn btn-danger" id="resetProgress">Сбросить прогресс по темам</button>
     </div>
   `;
 
   document.getElementById('resetProgress').addEventListener('click', () => {
-    if (confirm('Сбросить весь прогресс?')) {
+    if (confirm('Сбросить прогресс по темам и тестам?')) {
       state.progress = { completedTopics: [], testResults: {} };
       saveProgress();
       renderProgress(container);
     }
   });
+
+  container.querySelectorAll('.olymp-cb').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const prog = getOlympiadProgress();
+      const { olymp, stage } = cb.dataset;
+      if (!prog[olymp]) prog[olymp] = {};
+      prog[olymp][stage] = cb.checked;
+      saveOlympiadProgress(prog);
+    });
+  });
+}
+
+/* ===== Render: Glossary ===== */
+function renderGlossary(container) {
+  const glossary = APP_DATA.glossary || [];
+  const categories = [...new Set(glossary.map(g => g.category))];
+
+  container.innerHTML = `
+    <h1 class="page-title">Правовой словарик</h1>
+    <p class="page-subtitle">Ключевые термины для олимпиад по праву с кратким и развёрнутым объяснением.</p>
+    <div class="glossary-controls">
+      <input type="text" id="glossarySearch" class="glossary-search" placeholder="Поиск термина...">
+      <div class="glossary-cats">
+        <button class="glossary-cat-btn active" data-cat="">Все</button>
+        ${categories.map(c => `<button class="glossary-cat-btn" data-cat="${c}">${c}</button>`).join('')}
+      </div>
+    </div>
+    <div class="glossary-list" id="glossaryList">
+      ${glossary.map(g => `
+        <div class="glossary-card" data-cat="${g.category}" data-term="${g.term.toLowerCase()}">
+          <div class="glossary-header" data-id="${g.id}">
+            <div>
+              <span class="glossary-term">${g.term}</span>
+              <span class="glossary-badge">${g.category}</span>
+            </div>
+            <span class="glossary-arrow">▾</span>
+          </div>
+          <div class="glossary-short">${g.short}</div>
+          <div class="glossary-full hidden" id="gfull-${g.id}">${g.full}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  const search = document.getElementById('glossarySearch');
+  const list = document.getElementById('glossaryList');
+  let activeCat = '';
+
+  function filterGlossary() {
+    const q = search.value.toLowerCase().trim();
+    list.querySelectorAll('.glossary-card').forEach(card => {
+      const termMatch = card.dataset.term.includes(q) || card.querySelector('.glossary-short').textContent.toLowerCase().includes(q);
+      const catMatch = !activeCat || card.dataset.cat === activeCat;
+      card.style.display = termMatch && catMatch ? '' : 'none';
+    });
+  }
+
+  search.addEventListener('input', filterGlossary);
+
+  container.querySelectorAll('.glossary-cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.glossary-cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCat = btn.dataset.cat;
+      filterGlossary();
+    });
+  });
+
+  list.addEventListener('click', e => {
+    const header = e.target.closest('.glossary-header');
+    if (!header) return;
+    const id = header.dataset.id;
+    const fullEl = document.getElementById(`gfull-${id}`);
+    const arrow = header.querySelector('.glossary-arrow');
+    if (fullEl) {
+      fullEl.classList.toggle('hidden');
+      arrow.textContent = fullEl.classList.contains('hidden') ? '▾' : '▴';
+    }
+  });
+}
+
+/* ===== Render: Compare ===== */
+function renderCompare(container) {
+  const unis = APP_DATA.universities || [];
+  let selected = [];
+
+  function renderTable() {
+    if (selected.length < 2) {
+      return `<p class="compare-hint">Выберите минимум 2 вуза для сравнения.</p>`;
+    }
+    const fields = [
+      { key: 'name', label: 'Вуз' },
+      { key: 'city', label: 'Город' },
+      { key: 'program', label: 'Программа' },
+      { key: 'exams', label: 'ЕГЭ' },
+      { key: 'olympiads', label: 'Олимпиады' },
+      { key: 'budgetEge', label: 'Проходной балл' },
+      { key: 'note', label: 'Особенности' },
+    ];
+    const rows = fields.map(f => {
+      const cells = selected.map(u => `<td>${u[f.key] || '—'}</td>`).join('');
+      return `<tr><th>${f.label}</th>${cells}</tr>`;
+    }).join('');
+    return `<div class="compare-table-wrap"><table class="compare-table"><tbody>${rows}</tbody></table></div>`;
+  }
+
+  function render() {
+    const checkboxes = unis.map(u => {
+      const checked = selected.find(s => s.id === u.id) ? 'checked' : '';
+      return `<label class="compare-cb-label"><input type="checkbox" class="compare-uni-cb" data-id="${u.id}" ${checked}><span>${u.name}</span><small>${u.city}</small></label>`;
+    }).join('');
+    container.innerHTML = `
+      <h1 class="page-title">Сравнение вузов</h1>
+      <p class="page-subtitle">Выберите вузы для сравнения по ключевым параметрам.</p>
+      <div class="compare-checkboxes">${checkboxes}</div>
+      <div id="compareResult">${renderTable()}</div>
+    `;
+
+    container.querySelectorAll('.compare-uni-cb').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const uni = unis.find(u => u.id === cb.dataset.id);
+        if (!uni) return;
+        if (cb.checked) {
+          selected.push(uni);
+        } else {
+          selected = selected.filter(u => u.id !== uni.id);
+        }
+        document.getElementById('compareResult').innerHTML = renderTable();
+      });
+    });
+  }
+
+  render();
 }
 
 /* ===== Helpers ===== */
