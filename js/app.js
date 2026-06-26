@@ -448,8 +448,12 @@ function renderUniversities(container) {
   container.innerHTML = `
     <h1 class="page-title">ВУЗы для поступления на юриспруденцию</h1>
     <p class="page-subtitle">Куда можно поступить с олимпиадными льготами. Проходные баллы — примерные, ориентировочные для бюджета по прошлым годам; точные цифры публикуются вузами в текущем году.</p>
+    <div style="margin-bottom:24px;">
+      <button class="btn btn-outline" data-goto="compare">⇄ Сравнить вузы</button>
+    </div>
     ${sections}
   `;
+  bindGoto(container);
 }
 
 /* ===== Render: Topics ===== */
@@ -886,12 +890,16 @@ function renderGlossary(container) {
 /* ===== Render: Compare ===== */
 function renderCompare(container) {
   const unis = APP_DATA.universities || [];
-  let selected = [];
+  const selected = new Set();
 
   function renderTable() {
-    if (selected.length < 2) {
-      return `<p class="compare-hint">Выберите минимум 2 вуза для сравнения.</p>`;
+    const result = document.getElementById('compareResult');
+    if (!result) return;
+    if (selected.size < 2) {
+      result.innerHTML = `<p class="compare-hint">Выберите минимум 2 вуза для сравнения.</p>`;
+      return;
     }
+    const sel = unis.filter(u => selected.has(u.id));
     const fields = [
       { key: 'name', label: 'Вуз' },
       { key: 'city', label: 'Город' },
@@ -901,40 +909,41 @@ function renderCompare(container) {
       { key: 'budgetEge', label: 'Проходной балл' },
       { key: 'note', label: 'Особенности' },
     ];
-    const rows = fields.map(f => {
-      const cells = selected.map(u => `<td>${u[f.key] || '—'}</td>`).join('');
-      return `<tr><th>${f.label}</th>${cells}</tr>`;
-    }).join('');
-    return `<div class="compare-table-wrap"><table class="compare-table"><tbody>${rows}</tbody></table></div>`;
+    const header = `<tr><th></th>${sel.map(u => `<th>${u.name}</th>`).join('')}</tr>`;
+    const rows = fields.map(f =>
+      `<tr><td class="compare-field-label">${f.label}</td>${sel.map(u => `<td>${u[f.key] || '—'}</td>`).join('')}</tr>`
+    ).join('');
+    result.innerHTML = `<div class="compare-table-wrap"><table class="compare-table"><thead>${header}</thead><tbody>${rows}</tbody></table></div>`;
   }
 
-  function render() {
-    const checkboxes = unis.map(u => {
-      const checked = selected.find(s => s.id === u.id) ? 'checked' : '';
-      return `<label class="compare-cb-label"><input type="checkbox" class="compare-uni-cb" data-id="${u.id}" ${checked}><span>${u.name}</span><small>${u.city}</small></label>`;
-    }).join('');
-    container.innerHTML = `
-      <h1 class="page-title">Сравнение вузов</h1>
-      <p class="page-subtitle">Выберите вузы для сравнения по ключевым параметрам.</p>
-      <div class="compare-checkboxes">${checkboxes}</div>
-      <div id="compareResult">${renderTable()}</div>
-    `;
+  const checkboxes = unis.map(u =>
+    `<label class="compare-cb-label" data-uni="${u.id}">
+      <input type="checkbox" class="compare-uni-cb" data-id="${u.id}">
+      <span class="compare-uni-name">${u.name}</span>
+      <small>${u.city.split(',')[0]}</small>
+    </label>`
+  ).join('');
 
-    container.querySelectorAll('.compare-uni-cb').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const uni = unis.find(u => u.id === cb.dataset.id);
-        if (!uni) return;
-        if (cb.checked) {
-          selected.push(uni);
-        } else {
-          selected = selected.filter(u => u.id !== uni.id);
-        }
-        document.getElementById('compareResult').innerHTML = renderTable();
-      });
+  container.innerHTML = `
+    <h1 class="page-title">Сравнение вузов</h1>
+    <p class="page-subtitle">Отметьте 2 или более вуза для сравнения по ключевым параметрам.</p>
+    <div class="compare-checkboxes">${checkboxes}</div>
+    <div id="compareResult"><p class="compare-hint">Выберите минимум 2 вуза для сравнения.</p></div>
+  `;
+
+  container.querySelectorAll('.compare-uni-cb').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const label = cb.closest('.compare-cb-label');
+      if (cb.checked) {
+        selected.add(cb.dataset.id);
+        label.classList.add('selected');
+      } else {
+        selected.delete(cb.dataset.id);
+        label.classList.remove('selected');
+      }
+      renderTable();
     });
-  }
-
-  render();
+  });
 }
 
 /* ===== Helpers ===== */
