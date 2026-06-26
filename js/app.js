@@ -1,3 +1,5 @@
+const PAGE_START = performance.now();
+
 /* ===== State ===== */
 const state = {
   currentRoute: 'home',
@@ -80,8 +82,11 @@ function handleRoute() {
   state.currentRoute = route;
   const renderer = routes[route] || renderHome;
   const app = document.getElementById('app');
+  app.classList.remove('page-enter');
   app.innerHTML = '';
   renderer(app, param);
+  void app.offsetHeight;
+  app.classList.add('page-enter');
   updateActiveNav();
   window.scrollTo(0, 0);
 }
@@ -1421,6 +1426,265 @@ function initAIChat() {
   }
 }
 
+/* ===== Render: Practice ===== */
+function renderPractice(container, practiceId) {
+  if (practiceId) {
+    renderPracticeDetail(container, practiceId);
+  } else {
+    renderPracticeList(container);
+  }
+}
+
+function renderPracticeList(container) {
+  const items = APP_DATA.olympiadPractice || [];
+  if (!items.length) {
+    container.innerHTML = `<div class="empty-state"><h3>Пробники не добавлены</h3></div>`;
+    return;
+  }
+  const cards = items.map(p => `
+    <div class="card" data-goto="practice/${p.id}">
+      <h3>${p.title}</h3>
+      <p>${p.description}</p>
+      <div class="meta">
+        <span class="badge badge-accent">${p.olympiad}</span>
+        <span class="badge">${p.grade}</span>
+        <span class="badge">${p.totalScore} баллов</span>
+      </div>
+    </div>
+  `).join('');
+  container.innerHTML = `
+    <h1 class="page-title">Пробники олимпиад</h1>
+    <p class="page-subtitle">Тренировочные варианты в формате реальных олимпиад. Тест проверяется автоматически, задачи и эссе — с помощью AI.</p>
+    <div class="card-grid">${cards}</div>
+  `;
+  bindGoto(container);
+}
+
+function renderPracticeDetail(container, practiceId) {
+  const practice = (APP_DATA.olympiadPractice || []).find(p => p.id === practiceId);
+  if (!practice) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <h3>Пробник не найден</h3>
+        <button class="btn btn-outline" data-goto="practice">К пробникам</button>
+      </div>
+    `;
+    bindGoto(container);
+    return;
+  }
+
+  const partsHtml = practice.parts.map((part, partIdx) => {
+    if (part.type === 'test') {
+      const questionsHtml = part.questions.map((q, qIdx) => `
+        <div class="question" data-qid="${q.id}">
+          <div class="question-text">${qIdx + 1}. ${q.text}</div>
+          <div class="options">
+            ${q.options.map(opt => `
+              <label class="option" data-oid="${opt.id}">
+                <input type="radio" name="pr${partIdx}_${q.id}" value="${opt.id}">
+                <span>${opt.text}</span>
+              </label>
+            `).join('')}
+          </div>
+          <div class="explanation" id="pexp-${q.id}">${q.explanation || ''}</div>
+        </div>
+      `).join('');
+      return `
+        <section class="practice-part">
+          <h3 class="practice-part-title">${part.title}</h3>
+          <p class="practice-part-instructions">${part.instructions || ''}</p>
+          <form id="pform-${practiceId}-${part.id}">
+            ${questionsHtml}
+            <div class="topic-actions">
+              <button type="submit" class="btn btn-success">Проверить ответы</button>
+            </div>
+          </form>
+          <div id="presult-${part.id}" class="test-result" style="display:none;"></div>
+        </section>
+      `;
+    }
+
+    if (part.type === 'case' || part.type === 'essay') {
+      const isEssay = part.type === 'essay';
+      const tasksHtml = (part.tasks || []).map((task, tIdx) => `
+        <div class="practice-task" id="ptask-${task.id}">
+          <div class="practice-task-header">
+            ${task.points ? `<span class="badge">${task.points} б.</span>` : ''}
+            <span>${isEssay ? 'Тема' : 'Задача'} ${tIdx + 1}</span>
+          </div>
+          <div class="practice-task-text">${task.text}</div>
+          <div class="practice-answer-area">
+            <label class="practice-answer-label">${isEssay ? 'Ваше эссе:' : 'Ваш ответ:'}</label>
+            <textarea class="practice-textarea${isEssay ? ' practice-textarea-large' : ''}" id="pans-${task.id}" placeholder="${isEssay ? 'Напишите эссе (рекомендуется 200–350 слов)...' : 'Напишите развёрнутый ответ со ссылками на нормы права...'}"></textarea>
+            <button class="btn btn-primary practice-ai-btn" data-task-id="${task.id}">Проверить с AI</button>
+            <div class="ai-evaluation" id="peval-${task.id}" style="display:none;"></div>
+          </div>
+        </div>
+      `).join('');
+      return `
+        <section class="practice-part">
+          <h3 class="practice-part-title">${part.title}</h3>
+          <p class="practice-part-instructions">${part.instructions || ''}</p>
+          <p class="practice-part-meta"><strong>Максимальный балл:</strong> ${part.maxScore}</p>
+          ${tasksHtml}
+        </section>
+      `;
+    }
+    return '';
+  }).join('');
+
+  container.innerHTML = `
+    <div class="practice-container">
+      <div class="meta">
+        <span class="badge badge-accent">${practice.olympiad}</span>
+        <span class="badge">${practice.grade}</span>
+        <span class="badge">${practice.totalScore} баллов</span>
+      </div>
+      <h2 class="page-title" style="margin-top: 8px;">${practice.title}</h2>
+      <p class="page-subtitle">${practice.description}</p>
+      ${partsHtml}
+      <div class="topic-actions">
+        <button class="btn btn-outline" data-goto="practice">← К пробникам</button>
+      </div>
+    </div>
+  `;
+
+  bindGoto(container);
+  bindPracticeForms(practice);
+  bindPracticeAICheck(practice);
+}
+
+function bindPracticeForms(practice) {
+  practice.parts.forEach((part, partIdx) => {
+    if (part.type !== 'test') return;
+    const form = document.getElementById(`pform-${practice.id}-${part.id}`);
+    if (!form) return;
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      let score = 0;
+      part.questions.forEach(q => {
+        const checked = Array.from(document.querySelectorAll(`input[name="pr${partIdx}_${q.id}"]:checked`)).map(i => i.value);
+        const correct = q.options.filter(o => o.correct).map(o => o.id);
+        const isOk = checked.length === 1 && correct.includes(checked[0]);
+        if (isOk) score++;
+        document.querySelector(`.question[data-qid="${q.id}"]`)?.querySelectorAll('.option').forEach(optEl => {
+          const oid = optEl.dataset.oid;
+          optEl.classList.remove('correct', 'wrong');
+          if (correct.includes(oid)) optEl.classList.add('correct');
+          else if (checked.includes(oid)) optEl.classList.add('wrong');
+        });
+        const expEl = document.getElementById(`pexp-${q.id}`);
+        if (expEl) expEl.style.display = 'block';
+      });
+      const total = part.questions.length;
+      const pts = part.maxScore > 0 ? Math.round(score / total * part.maxScore) : score;
+      const resultEl = document.getElementById(`presult-${part.id}`);
+      if (resultEl) {
+        resultEl.style.display = 'block';
+        resultEl.innerHTML = `<div class="test-score">Результат: <strong>${score} из ${total}</strong> правильных ответов — <strong>${pts} из ${part.maxScore}</strong> баллов</div>`;
+      }
+    });
+  });
+}
+
+function bindPracticeAICheck(practice) {
+  document.querySelectorAll('.practice-ai-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const taskId = btn.dataset.taskId;
+      const answerEl = document.getElementById(`pans-${taskId}`);
+      const evalEl = document.getElementById(`peval-${taskId}`);
+      if (!answerEl || !evalEl) return;
+
+      const answer = answerEl.value.trim();
+      if (!answer) {
+        evalEl.style.display = 'block';
+        evalEl.innerHTML = `<div class="ai-eval-notice">Введите ваш ответ для проверки.</div>`;
+        return;
+      }
+
+      let taskText = '', criteria = [], modelAnswer = '';
+      for (const part of practice.parts) {
+        if (part.type === 'case' || part.type === 'essay') {
+          const task = (part.tasks || []).find(t => t.id === taskId);
+          if (task) {
+            taskText = task.text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+            criteria = task.criteria || [];
+            modelAnswer = task.modelAnswer || '';
+            break;
+          }
+        }
+      }
+
+      const proxyUrl = (typeof SITE_CONFIG !== 'undefined' && SITE_CONFIG.AI_PROXY_URL) ? SITE_CONFIG.AI_PROXY_URL : null;
+      if (!proxyUrl || proxyUrl.includes('your-subdomain')) {
+        evalEl.style.display = 'block';
+        evalEl.innerHTML = `<div class="ai-eval-notice">AI-проверка недоступна: прокси не настроен.</div>`;
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Анализирую...';
+      evalEl.style.display = 'block';
+      evalEl.innerHTML = `<div class="ai-eval-loading">AI анализирует ваш ответ…</div>`;
+
+      const criteriaText = criteria.length
+        ? '\n\nКРИТЕРИИ ОЦЕНИВАНИЯ:\n' + criteria.map((c, i) => `${i + 1}. ${c}`).join('\n')
+        : '';
+      const modelHint = modelAnswer
+        ? `\n\nЭТАЛОН (не раскрывай его полностью, используй как ориентир):\n${modelAnswer}`
+        : '';
+
+      const systemPrompt = 'Ты — строгий, но справедливый эксперт-проверяющий олимпиадных работ по праву. Оцени ответ участника по критериям. Укажи конкретно: что раскрыто верно, что пропущено или неточно, каких ссылок на нормы не хватает. Не давай готовый ответ целиком — направляй к самостоятельному мышлению.';
+      const userMessage = `ЗАДАНИЕ:\n${taskText}${criteriaText}${modelHint}\n\nОТВЕТ УЧАСТНИКА:\n${answer}\n\nОцени ответ по критериям. Будь конкретным и конструктивным.`;
+
+      try {
+        const response = await fetch(`${proxyUrl}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userMessage }
+          ]})
+        });
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err.error || `HTTP ${response.status}`);
+        }
+        const data = await response.json();
+        const reply = data.choices?.[0]?.message?.content || 'Нет ответа от модели.';
+        evalEl.innerHTML = `
+          <div class="ai-eval-result">
+            <div class="ai-eval-header">Оценка AI-юриста:</div>
+            <div class="ai-eval-content">${formatAIEvalContent(reply)}</div>
+          </div>
+        `;
+      } catch (err) {
+        evalEl.innerHTML = `<div class="ai-eval-error">Ошибка: ${err.message}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Проверить с AI';
+      }
+    });
+  });
+}
+
+function formatAIEvalContent(text) {
+  return text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+/* ===== Theme ===== */
+function initTheme() {
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    document.body.classList.add('theme-transitioning');
+    const isDark = document.body.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    setTimeout(() => document.body.classList.remove('theme-transitioning'), 350);
+  });
+}
+
 /* ===== Render: Feedback ===== */
 function renderFeedback(container) {
   const hasForm = SITE_CONFIG.FEEDBACK_FORM_URL && SITE_CONFIG.FEEDBACK_FORM_URL.trim() !== '';
@@ -1497,6 +1761,7 @@ function renderFeedback(container) {
 /* ===== Init ===== */
 document.addEventListener('DOMContentLoaded', () => {
   initRouter();
+  initTheme();
   initAIChat();
   document.querySelector('footer').addEventListener('click', (e) => {
     const a = e.target.closest('a[data-route]');
@@ -1505,4 +1770,9 @@ document.addEventListener('DOMContentLoaded', () => {
       navigate(a.dataset.route);
     }
   });
+
+  const elapsed = performance.now() - PAGE_START;
+  setTimeout(() => {
+    document.getElementById('page-loader')?.classList.add('hidden');
+  }, Math.max(0, 600 - elapsed));
 });
