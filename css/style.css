@@ -614,6 +614,7 @@ main {
     padding: 12px 20px;
     gap: 4px;
     display: none;
+    overflow-x: visible;
   }
 
   .main-nav.open {
