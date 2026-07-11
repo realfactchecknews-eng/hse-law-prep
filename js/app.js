@@ -89,6 +89,13 @@ function handleRoute() {
   app.classList.add('page-enter');
   updateActiveNav();
   window.scrollTo(0, 0);
+  trackPageview(route, param);
+}
+
+function trackPageview(route, param) {
+  if (typeof ym !== 'function') return;
+  const url = param ? `/${route}/${param}` : `/${route}`;
+  ym(110606842, 'hit', url, { title: document.title });
 }
 
 function navigate(route, param) {
